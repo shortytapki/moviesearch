@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "alloy",
+    "alloy/react",
+    "alloy/typescript",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "parserOptions": { "project": ["./tsconfig.json"] },
+  "globals": {
+    "API_URL": true,
+    "API_AUTH_TOKEN": true
+  },
+  "rules": {
+    "react/prop-types": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "no-console": "warn"
+  }
+}
