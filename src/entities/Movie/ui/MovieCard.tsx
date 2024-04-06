@@ -22,12 +22,14 @@ export const MovieCard = ({ className, movie }: MovieCardProps) => {
         variant="top"
         style={{ maxHeight: 500 }}
         src={
-          poster.previewUrl ||
-          poster.url ||
-          logo.url ||
-          backdrop.previewUrl ||
-          backdrop.url
+          poster?.previewUrl ||
+          poster?.url ||
+          logo?.url ||
+          backdrop?.previewUrl ||
+          backdrop?.url ||
+          ''
         }
+        alt={`Постер фильм ${name} не найден...`}
       />
       <CardBody>
         <Link to={RoutePaths.movie.replace(RouteParams.movieId, String(id))}>

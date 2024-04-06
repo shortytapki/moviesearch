@@ -1,13 +1,13 @@
 interface ExternalId {
-  kpHD?: string;
-  imdb?: string;
-  tmdb?: number;
+  kpHD: string | null;
+  imdb: string | null;
+  tmdb: number | null;
 }
 
 interface Name {
   name: string;
-  language?: string;
-  type?: string;
+  language: string | null;
+  type: string | null;
 }
 
 type Type =
@@ -29,46 +29,46 @@ type Status =
 
 interface Fact {
   value: string;
-  type?: string;
-  spoiler?: string;
+  type: string | null;
+  spoiler: string | null;
 }
 
 interface Rating {
-  kp?: number;
-  imdb?: number;
-  tmdb?: number;
-  filmCritics?: number;
-  russianFilmCritics?: number;
-  await?: number;
+  kp: number | null;
+  imdb: number | null;
+  tmdb: number | null;
+  filmCritics: number | null;
+  russianFilmCritics: number | null;
+  await: number | null;
 }
 
 interface Votes {
-  kp?: string;
-  imdb?: number;
-  tmdb?: number;
-  filmCritics?: number;
-  russianFilmCritics?: number;
-  await?: number;
+  kp: string | null;
+  imdb: number | null;
+  tmdb: number | null;
+  filmCritics: number | null;
+  russianFilmCritics: number | null;
+  await: number | null;
 }
 
 interface Logo {
-  url?: string;
+  url: string | null;
 }
 
 interface ShortImage extends Logo {
-  previewUrl?: string;
+  previewUrl: string | null;
 }
 
 interface Video {
-  url?: string;
-  name?: string;
-  site?: string;
-  size?: string;
-  type?: string;
+  url: string | null;
+  name: string | null;
+  site: string | null;
+  size: string | null;
+  type: string | null;
 }
 
 interface VideoTypes {
-  trailers?: Video[];
+  trailers: Video[] | null;
 }
 
 interface ItemName {
@@ -77,28 +77,28 @@ interface ItemName {
 
 interface PersonInMovie {
   id: number;
-  photo?: string;
-  name?: string;
-  enName?: string;
-  description?: string;
-  profession?: string;
-  enProfession?: string;
+  photo: string | null;
+  name: string | null;
+  enName: string | null;
+  description: string | null;
+  profession: string | null;
+  enProfession: string | null;
 }
 
 interface ReviewInfo {
-  count?: string;
-  positiveCount?: string;
-  percentage?: string;
+  count: string | null;
+  positiveCount: string | null;
+  percentage: string | null;
 }
 
 interface SeasonInfo {
-  number?: number;
-  episodesCount?: number;
+  number: number | null;
+  episodesCount: number | null;
 }
 
 interface CurrencyValue {
-  value?: string;
-  currency?: string;
+  value: string | null;
+  currency: string | null;
 }
 
 interface Fees {
@@ -108,28 +108,28 @@ interface Fees {
 }
 
 interface Premiere {
-  country?: string;
-  world?: string;
-  russia?: string;
-  digital?: string;
-  cinema?: string;
-  bluray?: string;
-  dvd?: string;
+  country: string | null;
+  world: string | null;
+  russia: string | null;
+  digital: string | null;
+  cinema: string | null;
+  bluray: string | null;
+  dvd: string | null;
 }
 
 interface LinkedMovie {
   id: number;
-  name?: string;
-  enName?: string;
-  alternativeName?: string;
-  type?: Type;
-  poster?: ShortImage;
-  rating?: Rating;
-  year?: string;
+  name: string | null;
+  enName: string | null;
+  alternativeName: string | null;
+  type: Type | null;
+  poster: ShortImage | null;
+  rating: Rating | null;
+  year: string | null;
 }
 
 interface WatchabilityItem {
-  name?: string;
+  name: string | null;
   logo: Logo;
   url: string;
 }
@@ -139,18 +139,18 @@ interface Watchability {
 }
 
 interface YearRange {
-  start?: number;
-  end?: number;
+  start: number | null;
+  end: number | null;
 }
 
 interface Audience {
-  count?: number;
-  country?: string;
+  count: number | null;
+  country: string | null;
 }
 
 interface NetworkItem {
-  name?: string;
-  logo?: Logo;
+  name: string | null;
+  logo: Logo | null;
 }
 
 interface Networks {
@@ -158,25 +158,25 @@ interface Networks {
 }
 
 export interface Movie {
-  id?: number;
-  externalId?: ExternalId;
-  name?: string;
-  alternativeName?: string;
-  enName?: string;
-  names?: Name[];
-  type?: Type;
-  typeNumber?: TypeNumber;
-  year?: number;
-  description?: string;
-  shortDescription?: string;
-  slogan?: string;
-  status?: Status;
-  facts?: Fact[];
+  id: number | null;
+  externalId: ExternalId | null;
+  name: string | null;
+  alternativeName: string | null;
+  enName: string | null;
+  names: Name[] | null;
+  type: Type | null;
+  typeNumber: TypeNumber | null;
+  year: number | null;
+  description: string | null;
+  shortDescription: string | null;
+  slogan: string | null;
+  status: Status | null;
+  facts: Fact[] | null;
   rating: Rating;
   votes: Votes;
-  movieLength?: number;
-  ratingMpaa?: string;
-  ageRating?: number;
+  movieLength: number | null;
+  ratingMpaa: string | null;
+  ageRating: number | null;
   logo: Logo;
   poster: ShortImage;
   backdrop: ShortImage;
@@ -189,19 +189,19 @@ export interface Movie {
   budget: CurrencyValue;
   fees: Fees;
   premiere: Premiere;
-  similarMovies?: LinkedMovie[];
-  sequelsAndPrequels?: LinkedMovie[];
+  similarMovies: LinkedMovie[] | null;
+  sequelsAndPrequels: LinkedMovie[] | null;
   watchability: Watchability;
   releaseYears: YearRange[];
-  top10?: number;
-  top250?: number;
-  ticketsOnSale?: boolean;
-  totalSeriesLength?: number;
-  seriesLength?: number;
-  isSeries?: boolean;
-  audience?: Audience[];
-  lists?: string[];
-  networks?: Networks;
-  updatedAt?: string;
-  createdAt?: string;
+  top10: number | null;
+  top250: number | null;
+  ticketsOnSale: boolean | null;
+  totalSeriesLength: number | null;
+  seriesLength: number | null;
+  isSeries: boolean | null;
+  audience: Audience[] | null;
+  lists: string[] | null;
+  networks: Networks | null;
+  updatedAt: string | null;
+  createdAt: string | null;
 }

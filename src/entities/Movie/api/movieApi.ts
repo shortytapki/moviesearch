@@ -20,9 +20,9 @@ export const movieApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
   endpoints: (builder) => ({
     getMovies: builder.query<MovieApiResponse, SearchParams>({
-      query: ({ limit, page }) => ({
+      query: ({ limit, page, query }) => ({
         headers: { 'X-API-KEY': API_TOKEN },
-        url: `movie?page=${page}&limit=${limit}`,
+        url: `movie?page=${page}&limit=${limit}` + query,
       }),
     }),
     searchMovie: builder.query<MovieApiResponse, SearchParams>({

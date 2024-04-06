@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 
-const createDebouncer = (fn: Function, ms = 300) => {
+const createDebouncer = (fn: Function, ms?: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return function (this: any, ...args: any[]) {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn.apply(this, args), ms);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms || 1000);
   };
 };
 
 export const useDebounce = <T>(
   initialValue: T,
-  delay: number,
+  delay?: number,
 ): [T, React.Dispatch<React.SetStateAction<T>>] => {
   const [value, setter] = useState(initialValue);
   const debouncedSetter = createDebouncer(setter, delay);
