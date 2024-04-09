@@ -42,7 +42,15 @@ export default function MoviePage() {
 
   return (
     <Container fluid>
-      <Link to={RoutePaths.main} state={{ search: location?.state?.search }}>
+      <Link
+        to={
+          RoutePaths.main +
+          Object.entries(location.state.search).reduce(
+            (acc, [k, v]) => acc + `&${k}=${v}`,
+            '?',
+          )
+        }
+      >
         <Button className="mb-5">Назад к выдаче</Button>
       </Link>
       <article className="d-flex flex-column gap-5">

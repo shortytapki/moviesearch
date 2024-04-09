@@ -8,7 +8,7 @@ export const loginByUsername = createAsyncThunk<
   User,
   User,
   ThunkConfig<string>
->('feature/loginByUsernam', async (body, thunkApi) => {
+>('feature/loginByUsername', async (body, thunkApi) => {
   const { extra, rejectWithValue } = thunkApi;
   try {
     const response = await fetch(AUTH_SERVER_URL + '/login', {
@@ -25,3 +25,27 @@ export const loginByUsername = createAsyncThunk<
     return rejectWithValue('Ошибка на сервере, попробуйте попытку позже.');
   }
 });
+
+export const register = createAsyncThunk<User, User, ThunkConfig<string>>(
+  'feature/register',
+  async (body, thunkApi) => {
+    const { extra, rejectWithValue } = thunkApi;
+    try {
+      const response = await fetch(AUTH_SERVER_URL + '/register', {
+        body: JSON.stringify(body),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok)
+        return rejectWithValue(
+          'Пользователь с таким именем уже зарегистрирован',
+        );
+      const user: User = await response.json();
+      localStorage.setItem(MOVIE_SEARCH_USER, JSON.stringify(user.username));
+      extra.navigate(RoutePaths.main);
+      return user;
+    } catch (e) {
+      return rejectWithValue('Ошибка на сервере, попробуйте попытку позже.');
+    }
+  },
+);

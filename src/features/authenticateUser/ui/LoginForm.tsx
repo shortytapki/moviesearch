@@ -1,8 +1,10 @@
 import { useAppDispatch } from '@app/providers/store/config/store';
 import { type FormEvent, useState } from 'react';
-import { Button, FormControl } from 'react-bootstrap';
+import { Button, FormControl, Spinner } from 'react-bootstrap';
 import { Form } from 'react-bootstrap';
 import { loginByUsername } from '../api/authenticateUser';
+import { useSelector } from 'react-redux';
+import { getError, getIsLoggingIn } from '@entities/User';
 
 interface LoginFormProps {
   className?: string;
@@ -12,6 +14,8 @@ export const LoginForm = ({ className }: LoginFormProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
+  const isLoggingIn = useSelector(getIsLoggingIn);
+  const error = useSelector(getError);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,6 +32,7 @@ export const LoginForm = ({ className }: LoginFormProps) => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
+        disabled={isLoggingIn}
       />
       <FormControl
         type="password"
@@ -37,8 +42,13 @@ export const LoginForm = ({ className }: LoginFormProps) => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        disabled={isLoggingIn}
       />
-      <Button type="submit">Войти</Button>
+      <Button className="mb-3" type="submit" disabled={isLoggingIn}>
+        Войти
+      </Button>
+      {isLoggingIn && <Spinner className="d-block" />}
+      {error && <p className="text-danger">{error}</p>}
     </Form>
   );
 };

@@ -16,7 +16,11 @@ import {
 import { countries, maxYear, minYear } from '@shared/consts/consts';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useDebounce } from '@shared/lib/useDebounce';
-import { createFilterQueryString, updateLastQueryHistory } from './utils/utils';
+import {
+  REFETCH_ATTEMPTS,
+  createFilterQueryString,
+  updateLastQueryHistory,
+} from './utils/utils';
 
 export interface MainPageFilters {
   name: string;
@@ -28,43 +32,35 @@ export interface MainPageFilters {
 }
 
 export const MainPage = () => {
-  const location: {
-    state: { filters: MainPageFilters } | null;
-    search: string;
-  } = useLocation();
+  const [fetchCount, setFetchCount] = useState(1);
+  const location = useLocation();
 
   const [searchParams, setSearchParams] = useSearchParams(
     new URLSearchParams(location.search),
   );
 
   const [currentPage, setCurrentPage] = useState(
-    Number(searchParams.get('page')) || location.state?.filters?.page || 1,
+    Number(searchParams.get('page')) || 1,
   );
 
   const [itemsPerPage, setItemsPerPage] = useState(
-    Number(searchParams.get('perPage')) ||
-      location.state?.filters?.perPage ||
-      10,
+    Number(searchParams.get('perPage')) || 10,
   );
 
-  const [searchName, setSearchName] = useState(
-    searchParams.get('name') || location.state?.filters?.name || '',
-  );
+  const [searchName, setSearchName] = useState(searchParams.get('name') || '');
 
   const debouncedSearchName = useDebounce(searchName);
 
-  const [searchYear, setSearchYear] = useState(
-    searchParams.get('year') || location.state?.filters?.year || '',
-  );
+  const [searchYear, setSearchYear] = useState(searchParams.get('year') || '');
 
   const debouncedSearchYear = useDebounce(searchYear);
 
   const [searchCountry, setSearchCountry] = useState(
-    searchParams.get('country') || location.state?.filters?.country || '',
+    searchParams.get('country') || '',
   );
 
   const [searchAgeRating, setSearchAgeRating] = useState(
-    searchParams.get('ageRating') || location.state?.filters?.ageRating || '',
+    searchParams.get('ageRating') || '',
   );
 
   const resetFilters = () => {
@@ -89,6 +85,7 @@ export const MainPage = () => {
     data: movieList,
     isFetching: isFetchingMainList,
     isError,
+    refetch,
   } = useGetMoviesQuery({
     page: currentPage,
     limit: itemsPerPage,
@@ -106,10 +103,19 @@ export const MainPage = () => {
     : movieList?.docs;
 
   useEffect(() => {
-    updateLastQueryHistory(
-      `${query}${searchName ? `&name=${searchName}` : ''}`,
-    );
-  }, [query, searchName]);
+    if (query || debouncedSearchName) {
+      updateLastQueryHistory(
+        `?${query}${debouncedSearchName ? `&name=${debouncedSearchName}` : ''}`,
+      );
+    }
+  }, [query, debouncedSearchName]);
+
+  useEffect(() => {
+    if (fetchCount < REFETCH_ATTEMPTS && isError) {
+      refetch();
+      setFetchCount(fetchCount + 1);
+    }
+  }, [isError]);
 
   return (
     <Container fluid>
@@ -242,7 +248,14 @@ export const MainPage = () => {
                   <MovieCard
                     className="h-100"
                     movie={movie}
-                    search={location.search}
+                    search={{
+                      page: currentPage,
+                      perPage: itemsPerPage,
+                      name: searchName,
+                      year: searchYear,
+                      country: searchCountry,
+                      ageRating: searchAgeRating,
+                    }}
                   />
                 </li>
               ))

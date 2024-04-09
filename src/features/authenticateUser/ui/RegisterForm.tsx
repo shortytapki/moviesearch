@@ -1,5 +1,9 @@
+import { useAppDispatch } from '@app/providers/store/config/store';
 import { type FormEvent, useState } from 'react';
-import { Button, Form, FormControl, FormGroup } from 'react-bootstrap';
+import { Button, Form, FormControl, FormGroup, Spinner } from 'react-bootstrap';
+import { register } from '../api/authenticateUser';
+import { useSelector } from 'react-redux';
+import { getError, getIsLoggingIn } from '@entities/User';
 
 interface RegisterFormProps {
   className?: string;
@@ -10,17 +14,17 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const isLoggingIn = useSelector(getIsLoggingIn);
+  const error = useSelector(getError);
+  const dispatch = useAppDispatch();
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(username, password);
+    dispatch(register({ username, password }));
   };
 
   return (
-    <Form
-      className={className}
-      onSubmit={handleSubmit}
-      validated={username.length > 3 && password.length > 6}
-    >
+    <Form className={className} onSubmit={handleSubmit}>
       <FormGroup>
         <FormControl
           type="text"
@@ -45,7 +49,7 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
         className="mb-3"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        // required
+        disabled={isLoggingIn}
       />
       <FormControl
         type="password"
@@ -54,9 +58,17 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
         className="mb-3"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        // required
+        disabled={isLoggingIn}
       />
-      <Button type="submit">Зарегистрироваться</Button>
+      <Button
+        type="submit"
+        disabled={isLoggingIn || confirmPassword !== password}
+        className="mb-3"
+      >
+        Зарегистрироваться
+      </Button>
+      {isLoggingIn && <Spinner className="d-block" />}
+      {error && <p className="text-danger">{error}</p>}
     </Form>
   );
 };

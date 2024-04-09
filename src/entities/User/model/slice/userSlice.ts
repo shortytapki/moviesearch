@@ -1,22 +1,35 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { User } from '../types/user';
-import { loginByUsername } from '@features/authenticateUser/api/authenticateUser';
+import { loginByUsername, register } from '@features/authenticateUser';
+import { MOVIE_SEARCH_USER } from '@shared/consts';
 
-export interface UserSchema {
-  user?: User;
+export interface UserSchema extends User {
   isLoggingIn: boolean;
   error?: string;
+  _initialized: boolean;
 }
 
 const initialState: UserSchema = {
-  user: undefined,
+  username: '',
   isLoggingIn: false,
   error: undefined,
+  _initialized: false,
 };
 
 const userSlice = createSlice({
   initialState,
-  reducers: {},
+  reducers: {
+    init: (state) => {
+      const user = localStorage.getItem(MOVIE_SEARCH_USER);
+      if (user) {
+        state.username = JSON.parse(user);
+      }
+      state._initialized = true;
+    },
+    logout: (state) => {
+      state.username = '';
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginByUsername.pending, (state) => {
@@ -25,10 +38,23 @@ const userSlice = createSlice({
       })
       .addCase(loginByUsername.fulfilled, (state, action) => {
         state.isLoggingIn = false;
-        state.user = action.payload;
+        state.username = action.payload.username;
         state.error = undefined;
       })
       .addCase(loginByUsername.rejected, (state, action) => {
+        state.isLoggingIn = false;
+        state.error = action.payload;
+      })
+      .addCase(register.pending, (state) => {
+        state.error = undefined;
+        state.isLoggingIn = true;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.isLoggingIn = false;
+        state.username = action.payload.username;
+        state.error = undefined;
+      })
+      .addCase(register.rejected, (state, action) => {
         state.isLoggingIn = false;
         state.error = action.payload;
       });

@@ -1,8 +1,5 @@
 import { movieApi } from '@entities/Movie';
-import {
-  userReducer,
-  userReducerPath,
-} from '@entities/User/model/slice/userSlice';
+import { userReducer, userReducerPath } from '@entities/User';
 import {
   combineReducers,
   configureStore,
