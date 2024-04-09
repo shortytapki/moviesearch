@@ -31,7 +31,14 @@ export const movieApi = createApi({
         url: `movie/search?page=${page}&limit=${limit}&query=${query}`,
       }),
     }),
+    getMovieById: builder.query<Movie, string>({
+      query: (id) => ({
+        headers: { 'X-API-KEY': API_TOKEN },
+        url: `movie/${id}`,
+      }),
+    }),
   }),
 });
 
-export const { useGetMoviesQuery, useSearchMovieQuery } = movieApi;
+export const { useGetMoviesQuery, useSearchMovieQuery, useGetMovieByIdQuery } =
+  movieApi;

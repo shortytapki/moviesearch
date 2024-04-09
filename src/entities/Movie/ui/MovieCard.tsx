@@ -12,10 +12,12 @@ import classNames from 'classnames';
 
 interface MovieCardProps extends CardProps {
   movie: Movie;
+  search: string;
 }
 
-export const MovieCard = ({ className, movie }: MovieCardProps) => {
-  const { name, logo, poster, id, backdrop, year, alternativeName } = movie;
+export const MovieCard = ({ className, movie, search }: MovieCardProps) => {
+  const { name, logo, poster, id, backdrop, year, alternativeName, rating } =
+    movie;
   return (
     <Card className={classNames(className)}>
       <CardImg
@@ -32,11 +34,17 @@ export const MovieCard = ({ className, movie }: MovieCardProps) => {
         alt={`Постер фильм ${name} не найден...`}
       />
       <CardBody>
-        <Link to={RoutePaths.movie.replace(RouteParams.movieId, String(id))}>
-          <CardText className="text-muted">
+        <Link
+          state={{ search }}
+          to={RoutePaths.movie.replace(RouteParams.movieId, String(id))}
+        >
+          <CardText>
             {alternativeName ? `${name} | ${alternativeName}` : name} ({year})
           </CardText>
         </Link>
+        <CardText className="text-secondary">
+          КП: {rating.kp}, IMDB: {rating.imdb}
+        </CardText>
       </CardBody>
     </Card>
   );

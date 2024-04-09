@@ -12,6 +12,7 @@ const paths: BuildPaths = {
 
 export default (env: BuildEnv): webpack.Configuration => {
   const token = env.token;
+  const authServerUrl = env.authServerUrl || '';
   if (typeof token !== 'string')
     throw Error('Error: API token is not provided.');
   const mode = env.mode || 'development';
@@ -27,6 +28,7 @@ export default (env: BuildEnv): webpack.Configuration => {
     port,
     token,
     apiUrl,
+    authServerUrl,
   });
 
   return config;

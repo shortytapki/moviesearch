@@ -75,7 +75,7 @@ interface ItemName {
   name: string;
 }
 
-interface PersonInMovie {
+export interface PersonInMovie {
   id: number;
   photo: string | null;
   name: string | null;
@@ -85,13 +85,13 @@ interface PersonInMovie {
   enProfession: string | null;
 }
 
-interface ReviewInfo {
+export interface ReviewInfo {
   count: string | null;
   positiveCount: string | null;
   percentage: string | null;
 }
 
-interface SeasonInfo {
+export interface SeasonInfo {
   number: number | null;
   episodesCount: number | null;
 }
@@ -117,7 +117,7 @@ interface Premiere {
   dvd: string | null;
 }
 
-interface LinkedMovie {
+export interface LinkedMovie {
   id: number;
   name: string | null;
   enName: string | null;

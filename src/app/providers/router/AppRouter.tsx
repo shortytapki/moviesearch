@@ -2,7 +2,7 @@ import { AppRoutes, RoutePaths } from '@shared/config/routeConfig';
 import { Route, type RouteProps, Routes } from 'react-router-dom';
 import { Suspense, memo, useCallback } from 'react';
 import { RequireAuth } from './RequireAuth';
-import { MainPage } from '@pages/index';
+import { LoginPage, MainPage, MoviePage, RegisterPage } from '@pages';
 
 type AppRouteProps = RouteProps & { authOnly?: boolean };
 
@@ -13,16 +13,24 @@ const routes: Record<AppRoutes, AppRouteProps> = {
   },
   [AppRoutes.MOVIE]: {
     path: RoutePaths.movie,
-    element: <>Movie Page</>,
+    element: <MoviePage />,
   },
   [AppRoutes.RANDOM_MOVIE]: {
     path: RoutePaths.randomMovie,
     element: <>RandomMovie page</>,
     authOnly: true,
   },
+  [AppRoutes.LOGIN]: {
+    path: RoutePaths.login,
+    element: <LoginPage />,
+  },
+  [AppRoutes.REGISTER]: {
+    path: RoutePaths.register,
+    element: <RegisterPage />,
+  },
   [AppRoutes.NOT_FOUND]: {
     path: RoutePaths.not_found,
-    element: <>404</>,
+    element: <>404, запрашиваемая страница не найдена</>,
   },
 };
 

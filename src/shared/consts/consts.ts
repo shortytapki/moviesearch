@@ -194,3 +194,5 @@ export const countries = [
 
 export const minYear = 1874;
 export const maxYear = 2050;
+export const MOVIE_SEARCH_USER = 'MOVIE_SEARCH_USER';
+export const MOVIE_SEARCH_QUERY_HISTORY = 'MOVIE_SEARCH_QUERY_HISTORY';

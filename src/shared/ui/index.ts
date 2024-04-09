@@ -1,1 +1,1 @@
-export { PaginationComponent as Pagination } from './Pagination';
+export { BigPagination, MainPagination as Pagination } from './Pagination';

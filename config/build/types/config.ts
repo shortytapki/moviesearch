@@ -12,6 +12,7 @@ export interface BuildEnv {
   port: number;
   apiUrl: string;
   token: string;
+  authServerUrl: string;
 }
 
 export interface BuildOptions {
@@ -21,4 +22,5 @@ export interface BuildOptions {
   port: number;
   apiUrl: string;
   token: string;
+  authServerUrl: string;
 }

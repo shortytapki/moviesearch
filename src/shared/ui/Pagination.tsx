@@ -8,6 +8,7 @@ interface PaginationComponentProps {
   currentPage: number;
   onPageChange: PageChangeFn;
   className?: string;
+  entityName: string;
 }
 
 const showPageItemsFunction = ({
@@ -15,13 +16,14 @@ const showPageItemsFunction = ({
   itemsPerPage,
   currentPage,
   onPageChange,
+  entityName,
 }: PaginationComponentProps) => {
   const data = [];
   if (total <= itemsPerPage) {
     for (let i = 1; i <= total; i++) {
       data.push(
         <Pagination.Item
-          key={i}
+          key={`${entityName}-${i}`}
           active={i === currentPage}
           onClick={() => onPageChange(i)}
         >
@@ -47,7 +49,7 @@ const showPageItemsFunction = ({
     for (let i = str; i <= end; i++) {
       data.push(
         <Pagination.Item
-          key={i}
+          key={`${entityName}-${i}`}
           active={i === currentPage}
           onClick={() => onPageChange(i)}
         >
@@ -71,10 +73,49 @@ const showPageItemsFunction = ({
   return data;
 };
 
-export const PaginationComponent = (props: PaginationComponentProps) => {
+export const BigPagination = (props: PaginationComponentProps) => {
   return (
     <Pagination className={props.className}>
       <Pagination>{showPageItemsFunction(props)}</Pagination>
+    </Pagination>
+  );
+};
+
+export const MainPagination = (props: PaginationComponentProps) => {
+  const {
+    onPageChange,
+    total,
+    itemsPerPage,
+    currentPage,
+    className,
+    entityName,
+  } = props;
+  const pagesAmount = Math.ceil(total / itemsPerPage);
+  return (
+    <Pagination className={className}>
+      <Pagination.First onClick={() => onPageChange(1)} />
+      <Pagination.Prev
+        onClick={() =>
+          onPageChange(currentPage === 1 ? pagesAmount : currentPage - 1)
+        }
+      />
+      {Array(Math.ceil(pagesAmount))
+        .fill(0)
+        .map((_, idx) => (
+          <Pagination.Item
+            active={currentPage === idx + 1}
+            key={`${entityName}-${idx}`}
+            onClick={() => onPageChange(idx + 1)}
+          >
+            {idx + 1}
+          </Pagination.Item>
+        ))}
+      <Pagination.Next
+        onClick={() =>
+          onPageChange(currentPage === pagesAmount ? 1 : currentPage + 1)
+        }
+      />
+      <Pagination.Last onClick={() => onPageChange(pagesAmount)} />
     </Pagination>
   );
 };

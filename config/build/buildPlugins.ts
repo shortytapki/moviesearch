@@ -9,6 +9,7 @@ export default function buildPlugins({
   isDev,
   apiUrl,
   token,
+  authServerUrl,
 }: BuildOptions): webpack.WebpackPluginInstance[] {
   const plugins = [
     new HtmlWebpackPlugin({
@@ -22,6 +23,7 @@ export default function buildPlugins({
     new webpack.DefinePlugin({
       API_TOKEN: JSON.stringify(token),
       API_URL: JSON.stringify(apiUrl),
+      AUTH_SERVER_URL: JSON.stringify(authServerUrl),
     }),
   ];
 
