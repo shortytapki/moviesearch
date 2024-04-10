@@ -14,7 +14,7 @@ export enum RouteParams {
 export const RoutePaths: Record<AppRoutes, string> = {
   [AppRoutes.MAIN]: '/',
   [AppRoutes.MOVIE]: `/movie/${RouteParams.movieId}`,
-  [AppRoutes.RANDOM_MOVIE]: 'random_movie',
+  [AppRoutes.RANDOM_MOVIE]: '/random_movie',
   [AppRoutes.LOGIN]: '/login',
   [AppRoutes.REGISTER]: '/register',
   [AppRoutes.NOT_FOUND]: '*',

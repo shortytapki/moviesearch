@@ -1,7 +1,8 @@
 export {
   movieApi,
   useGetMoviesQuery,
-  useSearchMovieQuery,
+  useRandomMovieQuery,
+  useGetReviewsByMovieIdQuery,
   useGetMovieByIdQuery,
 } from './api/movieApi';
 

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { Movie } from '../model/types/movie';
+import type { Movie, Review } from '../model/types/movie';
 
 interface SearchParams {
   page?: number;
@@ -25,20 +25,30 @@ export const movieApi = createApi({
         url: `movie?page=${page}&limit=${limit}` + query,
       }),
     }),
-    searchMovie: builder.query<MovieApiResponse, SearchParams>({
-      query: ({ limit, page, query }) => ({
-        headers: { 'X-API-KEY': API_TOKEN },
-        url: `movie/search?page=${page}&limit=${limit}&query=${query}`,
-      }),
-    }),
     getMovieById: builder.query<Movie, string>({
       query: (id) => ({
         headers: { 'X-API-KEY': API_TOKEN },
         url: `movie/${id}`,
       }),
     }),
+    getReviewsByMovieId: builder.query<Review, string>({
+      query: (id) => ({
+        headers: { 'X-API-KEY': API_TOKEN },
+        url: `review/?movieId=${id}`,
+      }),
+    }),
+    randomMovie: builder.query<Movie, string | undefined>({
+      query: (query) => ({
+        headers: { 'X-API-KEY': API_TOKEN },
+        url: 'movie/random?' + query,
+      }),
+    }),
   }),
 });
 
-export const { useGetMoviesQuery, useSearchMovieQuery, useGetMovieByIdQuery } =
-  movieApi;
+export const {
+  useGetMoviesQuery,
+  useGetMovieByIdQuery,
+  useRandomMovieQuery,
+  useGetReviewsByMovieIdQuery,
+} = movieApi;

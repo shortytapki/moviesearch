@@ -1,8 +1,15 @@
+import { Spinner } from 'react-bootstrap';
 import { AppRoutes, RoutePaths } from '@shared/config/routeConfig';
 import { Route, type RouteProps, Routes } from 'react-router-dom';
 import { Suspense, memo, useCallback } from 'react';
 import { RequireAuth } from './RequireAuth';
-import { LoginPage, MainPage, MoviePage, RegisterPage } from '@pages';
+import {
+  LoginPage,
+  MainPage,
+  MoviePage,
+  RegisterPage,
+  RandomMoviePage,
+} from '@pages';
 
 type AppRouteProps = RouteProps & { authOnly?: boolean };
 
@@ -17,7 +24,7 @@ const routes: Record<AppRoutes, AppRouteProps> = {
   },
   [AppRoutes.RANDOM_MOVIE]: {
     path: RoutePaths.randomMovie,
-    element: <>RandomMovie page</>,
+    element: <RandomMoviePage />,
     authOnly: true,
   },
   [AppRoutes.LOGIN]: {
@@ -41,11 +48,13 @@ const Router = () => {
         key={route.path}
         path={route.path}
         element={
-          route.authOnly ? (
-            <RequireAuth>{route.element}</RequireAuth>
-          ) : (
-            <Suspense fallback={<>Loading</>}>{route.element}</Suspense>
-          )
+          <Suspense fallback={<Spinner />}>
+            {route.authOnly ? (
+              <RequireAuth>{route.element}</RequireAuth>
+            ) : (
+              route.element
+            )}
+          </Suspense>
         }
       />
     );
