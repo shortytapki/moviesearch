@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { MovieCard, useGetMoviesQuery } from '@entities/Movie';
 import { BigPagination } from '@shared/ui';
 import {
@@ -10,17 +10,17 @@ import {
   Row,
   Spinner,
   Col,
-  FormSelect,
   Button,
 } from 'react-bootstrap';
 import { countries, maxYear, minYear } from '@shared/consts/consts';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { useDebounce } from '@shared/lib/useDebounce';
+import { debounce, useDebounce } from '@shared/lib/useDebounce';
 import {
   REFETCH_ATTEMPTS,
   createFilterQueryString,
   updateLastQueryHistory,
 } from './utils/utils';
+import Select, { type MultiValue } from 'react-select';
 
 export interface MainPageFilters {
   name: string;
@@ -48,12 +48,7 @@ export const MainPage = () => {
   );
 
   const [searchName, setSearchName] = useState(searchParams.get('name') || '');
-
-  const debouncedSearchName = useDebounce(searchName);
-
   const [searchYear, setSearchYear] = useState(searchParams.get('year') || '');
-
-  const debouncedSearchYear = useDebounce(searchYear);
 
   const [searchCountry, setSearchCountry] = useState(
     searchParams.get('country') || '',
@@ -62,6 +57,10 @@ export const MainPage = () => {
   const [searchAgeRating, setSearchAgeRating] = useState(
     searchParams.get('ageRating') || '',
   );
+
+  const debouncedSearchYear = useDebounce(searchYear);
+  const debouncedSearchName = useDebounce(searchName);
+  const debouncedPerPage = useDebounce(itemsPerPage);
 
   const resetFilters = () => {
     [
@@ -88,11 +87,11 @@ export const MainPage = () => {
     refetch,
   } = useGetMoviesQuery({
     page: currentPage,
-    limit: itemsPerPage,
+    limit: debouncedPerPage,
     query,
   });
   const total = 100;
-  const ageRatins = ['6', '12', '16', '18'];
+  const ageRatings = ['6', '12', '16', '18'];
 
   const filteredByName = debouncedSearchName
     ? movieList?.docs.filter((m) =>
@@ -117,6 +116,70 @@ export const MainPage = () => {
     }
   }, [isError]);
 
+  const changePerPageParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    const toSet = value > 1 && value < total ? value : 1;
+    setItemsPerPage(toSet);
+    debounce(() => {
+      setSearchParams((params) => {
+        params.set('perPage', String(toSet));
+        return params;
+      });
+    });
+  }, []);
+
+  const changeNameParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchName(value);
+    debounce(() => {
+      setSearchParams((params) => {
+        value ? params.set('name', value) : params.delete('name');
+        return params;
+      });
+    });
+  }, []);
+
+  const changeYearParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchYear(value);
+    debounce(() => {
+      setSearchParams((params) => {
+        value ? params.set('year', value) : params.delete('year');
+        return params;
+      });
+    });
+  }, []);
+
+  const changeRatingParam = useCallback(
+    (options: MultiValue<{ label: string; value: string }>) => {
+      const value =
+        options.length > 1
+          ? options.map((o) => o.value).join('&ageRating=+')
+          : options.at(0)?.value || '';
+      setSearchAgeRating(value);
+      setSearchParams((params) => {
+        value ? params.set('ageRating', value) : params.delete('ageRating');
+        return params;
+      });
+    },
+    [],
+  );
+
+  const changeCountryParam = useCallback(
+    (options: MultiValue<{ label: string; value: string }>) => {
+      const value =
+        options.length > 1
+          ? options.map((o) => o.value).join('&countries.name=+')
+          : options.at(0)?.value || '';
+      setSearchCountry(value);
+      setSearchParams((params) => {
+        value ? params.set('country', value) : params.delete('country');
+        return params;
+      });
+    },
+    [],
+  );
+
   return (
     <Container fluid>
       <Button onClick={resetFilters} className="mb-4">
@@ -129,15 +192,7 @@ export const MainPage = () => {
             type="number"
             min={1}
             max={total}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setSearchParams((params) => {
-                e.target.value
-                  ? params.set('perPage', e.target.value)
-                  : params.delete('perPage');
-                return params;
-              });
-            }}
+            onChange={changePerPageParam}
             value={itemsPerPage}
           />
         </FormGroup>
@@ -147,15 +202,7 @@ export const MainPage = () => {
             placeholder="Введите поисковой запрос..."
             type="text"
             value={searchName}
-            onChange={(e) => {
-              setSearchName(e.target.value);
-              setSearchParams((params) => {
-                e.target.value
-                  ? params.set('name', e.target.value)
-                  : params.delete('name');
-                return params;
-              });
-            }}
+            onChange={changeNameParam}
           />
         </FormGroup>
         <FormGroup>
@@ -165,15 +212,7 @@ export const MainPage = () => {
               <Col>
                 <FormControl
                   id="search-year"
-                  onChange={(e) => {
-                    setSearchYear(e.target.value);
-                    setSearchParams((params) => {
-                      e.target.value
-                        ? params.set('year', e.target.value)
-                        : params.delete('year');
-                      return params;
-                    });
-                  }}
+                  onChange={changeYearParam}
                   type="number"
                   placeholder="Год"
                   min={minYear}
@@ -182,47 +221,39 @@ export const MainPage = () => {
                 />
               </Col>
             </Col>
-            <Col xs="12" lg="auto" className="flex-grow-1" defaultValue="">
-              <FormSelect
-                onChange={(e) => {
-                  setSearchCountry(e.target.value);
-                  setSearchParams((params) => {
-                    e.target.value
-                      ? params.set('country', e.target.value)
-                      : params.delete('country');
-                    return params;
-                  });
+            <Col>
+              <Select
+                className="w-100"
+                isMulti
+                onChange={changeCountryParam}
+                placeholder="Страны производства"
+                options={countries.map((c) => ({ label: c, value: c }))}
+                noOptionsMessage={() => 'Стран не найдено'}
+                styles={{
+                  menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
-                value={searchCountry}
-              >
-                <option value="">Страна</option>
-                {countries.map((c) => (
-                  <option value={c} key={c}>
-                    {c}
-                  </option>
-                ))}
-              </FormSelect>
+                defaultValue={countries
+                  .filter((c) => searchCountry.includes(c))
+                  .map((c) => ({ label: c, value: c }))}
+              />
             </Col>
-            <Col xs="12" lg="auto" className="flex-grow-1">
-              <FormSelect
-                onChange={(e) => {
-                  setSearchAgeRating(e.target.value);
-                  setSearchParams((params) => {
-                    e.target.value
-                      ? params.set('ageRating', e.target.value)
-                      : params.delete('ageRating');
-                    return params;
-                  });
+            <Col>
+              <Select
+                className="w-100"
+                isMulti
+                onChange={changeRatingParam}
+                placeholder="Возрастной рейтинг"
+                options={ageRatings.map((r) => ({ label: r, value: r }))}
+                noOptionsMessage={() => 'Значений не найдено'}
+                styles={{
+                  menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
-                value={searchAgeRating}
-              >
-                <option value="">Возрастной рейтинг</option>
-                {ageRatins.map((r) => (
-                  <option value={r} key={r}>
-                    {r}+
-                  </option>
-                ))}
-              </FormSelect>
+                defaultValue={ageRatings
+                  .filter((r) =>
+                    searchAgeRating.includes(String(parseInt(r, 10))),
+                  )
+                  .map((r) => ({ label: r, value: r }))}
+              />
             </Col>
           </Row>
         </FormGroup>
@@ -259,7 +290,8 @@ export const MainPage = () => {
                   />
                 </li>
               ))
-            : 'По введёным фильтрам на текущей странице фильмов и сериалов не найдено'}
+            : !isError &&
+              'По введёным фильтрам на текущей странице фильмов и сериалов не найдено'}
         </ul>
       )}
       {isError && (

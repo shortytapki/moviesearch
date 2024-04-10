@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 export function debounce<Params extends any[]>(
   func: (...args: Params) => any,
-  timeout: number,
+  timeout = 1000,
 ): (...args: Params) => void {
   let timer: NodeJS.Timeout;
   return (...args: Params) => {
