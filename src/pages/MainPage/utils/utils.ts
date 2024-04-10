@@ -8,7 +8,7 @@ export const createFilterQueryString = (filters: Record<string, string>) =>
     .filter(([_, v]) => Boolean(v))
     .reduce((acc, [k, v]) => acc + `&${k}=${v}`, '');
 
-export const updateLastQueryHistory = (q: string) => {
+export const updateLastQueryHistory = (q?: string) => {
   const historyString = localStorage.getItem(MOVIE_SEARCH_QUERY_HISTORY);
 
   const history: string[] = historyString ? JSON.parse(historyString) : [];

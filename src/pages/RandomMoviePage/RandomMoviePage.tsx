@@ -64,8 +64,8 @@ export default function RandomMoviePage() {
           className="mb-3"
           placeholder="Страны производства"
           options={countries.map((country) => ({
-            label: country,
-            value: country,
+            label: country.name,
+            value: country.name,
           }))}
           onChange={(picked) =>
             setPickedCountries(picked.map((option) => option.value))

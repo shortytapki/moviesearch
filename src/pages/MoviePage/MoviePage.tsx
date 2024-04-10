@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import {
   Container,
@@ -9,7 +9,10 @@ import {
   Carousel,
   Button,
 } from 'react-bootstrap';
-import { useGetMovieByIdQuery } from '@entities/Movie';
+import {
+  useGetMovieByIdQuery,
+  useGetReviewsByMovieIdQuery,
+} from '@entities/Movie';
 import { RoutePaths } from '@shared/config/routeConfig';
 import { ActorsSection } from './MoviPageSections/ActorsSection';
 import { SeasonsSection } from './MoviPageSections/SeasonsSection';
@@ -17,17 +20,28 @@ import { LinkedMovies } from './MoviPageSections/LinkedMoviesSection';
 import { ReviewsSection } from './MoviPageSections/ReviewsSection';
 
 export default function MoviePage() {
-  const location = useLocation();
   const [actorsPage, setActorsPage] = useState(1);
   const [seasonsPage, setSeasonsPage] = useState(1);
-  const { id: initialId } = useParams();
+  const [reviewsPage, setReviewsPage] = useState(1);
+
+  const reviewsLimit = 10;
+
+  const { id: directId } = useParams();
   const {
     data: movie,
     isSuccess,
     isFetching,
-  } = useGetMovieByIdQuery(initialId || '');
+  } = useGetMovieByIdQuery(directId || '');
+
+  const { data: reviews } = useGetReviewsByMovieIdQuery({
+    page: reviewsPage,
+    limit: reviewsLimit,
+    query: directId,
+  });
+
   if (isFetching) return <Spinner size="sm" />;
   if (!isSuccess) return <h1>Фильм с указанным id не найден.</h1>;
+
   const { alternativeName, name, description, rating, poster, logo, backdrop } =
     movie;
   const formattedName =
@@ -42,15 +56,7 @@ export default function MoviePage() {
 
   return (
     <Container fluid>
-      <Link
-        to={
-          RoutePaths.main +
-          Object.entries(location.state.search).reduce(
-            (acc, [k, v]) => acc + `&${k}=${v}`,
-            '?',
-          )
-        }
-      >
+      <Link to={RoutePaths.main}>
         <Button className="mb-5">Назад к выдаче</Button>
       </Link>
       <article className="d-flex flex-column gap-5">
@@ -105,7 +111,15 @@ export default function MoviePage() {
             onPageChange={setSeasonsPage}
           />
         )}
-        <ReviewsSection movie={movie} />
+        {reviews && (
+          <ReviewsSection
+            limit={reviewsLimit}
+            reviews={reviews.docs}
+            pagesCount={reviews.pages}
+            page={reviewsPage}
+            onPageChange={setReviewsPage}
+          />
+        )}
         <LinkedMovies movie={movie} />
       </article>
     </Container>

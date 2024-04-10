@@ -31,7 +31,7 @@ export const ActorsSection = ({
         <Pagination
           className="justify-content-center"
           entityName="actorsPagination"
-          total={persons.length}
+          pagesCount={persons.length}
           currentPage={currentPage}
           onPageChange={onPageChange}
           itemsPerPage={itemsPerPage}

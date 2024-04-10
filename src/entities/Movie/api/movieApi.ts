@@ -7,12 +7,19 @@ interface SearchParams {
   query?: string;
 }
 
-interface MovieApiResponse {
-  docs: Movie[];
+interface Additionals {
   total: number;
   limit: number;
   page: number;
   pages: number;
+}
+
+interface MovieApiResponse extends Additionals {
+  docs: Movie[];
+}
+
+interface ReviewApiResponse extends Additionals {
+  docs: Review[];
 }
 
 export const movieApi = createApi({
@@ -25,16 +32,22 @@ export const movieApi = createApi({
         url: `movie?page=${page}&limit=${limit}` + query,
       }),
     }),
+    getMovieByName: builder.query<MovieApiResponse, SearchParams>({
+      query: ({ limit, page, query }) => ({
+        headers: { 'X-API-KEY': API_TOKEN },
+        url: `movie/search?page=${page}&limit=${limit}&query=${query}`,
+      }),
+    }),
     getMovieById: builder.query<Movie, string>({
       query: (id) => ({
         headers: { 'X-API-KEY': API_TOKEN },
         url: `movie/${id}`,
       }),
     }),
-    getReviewsByMovieId: builder.query<Review, string>({
-      query: (id) => ({
+    getReviewsByMovieId: builder.query<ReviewApiResponse, SearchParams>({
+      query: ({ page, limit, query }) => ({
         headers: { 'X-API-KEY': API_TOKEN },
-        url: `review/?movieId=${id}`,
+        url: `review?page=${page}&limit=${limit}&movieId=${query}`,
       }),
     }),
     randomMovie: builder.query<Movie, string | undefined>({
@@ -51,4 +64,5 @@ export const {
   useGetMovieByIdQuery,
   useRandomMovieQuery,
   useGetReviewsByMovieIdQuery,
+  useGetMovieByNameQuery,
 } = movieApi;

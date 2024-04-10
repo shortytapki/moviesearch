@@ -3,7 +3,7 @@ import Pagination from 'react-bootstrap/Pagination';
 type PageChangeFn = (item: number) => void;
 
 interface PaginationComponentProps {
-  total: number;
+  pagesCount: number;
   itemsPerPage: number;
   currentPage: number;
   onPageChange: PageChangeFn;
@@ -12,15 +12,15 @@ interface PaginationComponentProps {
 }
 
 const showPageItemsFunction = ({
-  total,
+  pagesCount,
   itemsPerPage,
   currentPage,
   onPageChange,
   entityName,
 }: PaginationComponentProps) => {
   const data = [];
-  if (total <= itemsPerPage) {
-    for (let i = 1; i <= total; i++) {
+  if (pagesCount <= itemsPerPage) {
+    for (let i = 1; i <= pagesCount; i++) {
       data.push(
         <Pagination.Item
           key={`${entityName}-${i}`}
@@ -33,7 +33,7 @@ const showPageItemsFunction = ({
     }
   } else {
     const leftside = currentPage - itemsPerPage / 2 > 1;
-    const rightside = currentPage + itemsPerPage / 2 < total;
+    const rightside = currentPage + itemsPerPage / 2 < pagesCount;
     data.push(<Pagination.First key="first" onClick={() => onPageChange(1)} />);
     data.push(
       <Pagination.Prev
@@ -44,8 +44,11 @@ const showPageItemsFunction = ({
     if (leftside) {
       data.push(<Pagination.Ellipsis key="leftEllipsis" />);
     }
-    const str = Math.max(1, Math.round(currentPage - itemsPerPage / 2));
-    const end = Math.min(total, Math.round(currentPage + itemsPerPage / 2));
+    const str = Math.max(1, Math.round(currentPage - itemsPerPage / 5));
+    const end = Math.min(
+      pagesCount,
+      Math.round(currentPage + itemsPerPage / 5),
+    );
     for (let i = str; i <= end; i++) {
       data.push(
         <Pagination.Item
@@ -67,7 +70,7 @@ const showPageItemsFunction = ({
       />,
     );
     data.push(
-      <Pagination.Last key="last" onClick={() => onPageChange(total)} />,
+      <Pagination.Last key="last" onClick={() => onPageChange(pagesCount)} />,
     );
   }
   return data;
@@ -84,13 +87,13 @@ export const BigPagination = (props: PaginationComponentProps) => {
 export const MainPagination = (props: PaginationComponentProps) => {
   const {
     onPageChange,
-    total,
+    pagesCount,
     itemsPerPage,
     currentPage,
     className,
     entityName,
   } = props;
-  const pagesAmount = Math.ceil(total / itemsPerPage);
+  const pagesAmount = Math.ceil(pagesCount / itemsPerPage);
   return (
     <Pagination className={className}>
       <Pagination.First onClick={() => onPageChange(1)} />

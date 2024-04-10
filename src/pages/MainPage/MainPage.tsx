@@ -1,5 +1,9 @@
 import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { MovieCard, useGetMoviesQuery } from '@entities/Movie';
+import {
+  MovieCard,
+  useGetMovieByNameQuery,
+  useGetMoviesQuery,
+} from '@entities/Movie';
 import { BigPagination } from '@shared/ui';
 import {
   Container,
@@ -12,9 +16,14 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import { countries, maxYear, minYear } from '@shared/consts/consts';
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { debounce, useDebounce } from '@shared/lib/useDebounce';
+import {
+  MOVIE_SEARCH_QUERY_HISTORY,
+  countries,
+  maxYear,
+  minYear,
+} from '@shared/consts/consts';
+import { useLocation } from 'react-router-dom';
+import { useDebounce } from '@shared/lib/useDebounce';
 import {
   REFETCH_ATTEMPTS,
   createFilterQueryString,
@@ -32,13 +41,10 @@ export interface MainPageFilters {
 }
 
 export const MainPage = () => {
-  const [fetchCount, setFetchCount] = useState(1);
   const location = useLocation();
-
-  const [searchParams, setSearchParams] = useSearchParams(
-    new URLSearchParams(location.search),
-  );
-
+  const searchParams = new URLSearchParams(location.search);
+  const [searchHistory, setSearchHistory] = useState(updateLastQueryHistory());
+  const splitYear = searchParams.get('year')?.split('-');
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get('page')) || 1,
   );
@@ -47,141 +53,175 @@ export const MainPage = () => {
     Number(searchParams.get('perPage')) || 10,
   );
 
-  const [searchName, setSearchName] = useState(searchParams.get('name') || '');
-  const [searchYear, setSearchYear] = useState(searchParams.get('year') || '');
+  const [name, setName] = useState(searchParams.get('name') || '');
+  const [yearLeft, setYearLeft] = useState(splitYear?.at(0) || '');
+  const [yearRight, setYearRight] = useState(splitYear?.at(1) || '');
+
+  const year =
+    yearLeft && yearRight ? `${yearLeft}-${yearRight}` : yearLeft || yearRight;
 
   const [searchCountry, setSearchCountry] = useState(
     searchParams.get('country') || '',
   );
 
-  const [searchAgeRating, setSearchAgeRating] = useState(
+  const [ageRating, setAgeRating] = useState(
     searchParams.get('ageRating') || '',
   );
 
-  const debouncedSearchYear = useDebounce(searchYear);
-  const debouncedSearchName = useDebounce(searchName);
+  const [fetchCount, setFetchCount] = useState(1);
+
+  const pickedCountriesSet = new Set(searchCountry.split('&countries.name=+'));
+  const debouncedYear = useDebounce(year);
+  const debouncedName = useDebounce(name);
   const debouncedPerPage = useDebounce(itemsPerPage);
 
   const resetFilters = () => {
     [
-      setSearchName,
-      setSearchYear,
+      setName,
+      setYearLeft,
+      setYearRight,
       setSearchCountry,
-      setSearchAgeRating,
+      setAgeRating,
     ].forEach((setter) => setter(''));
     setItemsPerPage(10);
     setCurrentPage(1);
-    setSearchParams(new URLSearchParams());
   };
 
   const query = createFilterQueryString({
-    ageRating: searchAgeRating,
+    ageRating,
     'countries.name': searchCountry,
-    year: debouncedSearchYear,
+    year: debouncedYear,
   });
 
   const {
     data: movieList,
     isFetching: isFetchingMainList,
-    isError,
-    refetch,
+    isError: movieListError,
+    refetch: refetchMovieList,
   } = useGetMoviesQuery({
     page: currentPage,
     limit: debouncedPerPage,
     query,
   });
-  const total = 100;
-  const ageRatings = ['6', '12', '16', '18'];
 
-  const filteredByName = debouncedSearchName
-    ? movieList?.docs.filter((m) =>
-        debouncedSearchName
-          ? m.names?.some((n) => n.name.includes(debouncedSearchName))
-          : m,
-      )
-    : movieList?.docs;
+  const {
+    data: nameFilteredMovieList,
+    isError: nameFilteredMovieListError,
+    isFetching: isFethcingNameFilteredList,
+  } = useGetMovieByNameQuery(
+    {
+      page: currentPage,
+      limit: debouncedPerPage,
+      query: debouncedName,
+    },
+    { skip: !debouncedName },
+  );
+
+  const isError = nameFilteredMovieListError || movieListError;
+  const isFetching = isFetchingMainList || isFethcingNameFilteredList;
+
+  const total = 100;
+  const ageRatings = [6, 12, 16, 18];
 
   useEffect(() => {
-    if (query || debouncedSearchName) {
-      updateLastQueryHistory(
-        `?${query}${debouncedSearchName ? `&name=${debouncedSearchName}` : ''}`,
+    if (query || debouncedName) {
+      setSearchHistory(
+        updateLastQueryHistory(
+          `?${query}${debouncedName ? `&name=${debouncedName}` : ''}`,
+        ),
       );
     }
-  }, [query, debouncedSearchName]);
+  }, [query, debouncedName]);
 
   useEffect(() => {
     if (fetchCount < REFETCH_ATTEMPTS && isError) {
-      refetch();
+      refetchMovieList();
       setFetchCount(fetchCount + 1);
     }
   }, [isError]);
 
-  const changePerPageParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const onPerPageChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     const toSet = value > 1 && value < total ? value : 1;
     setItemsPerPage(toSet);
-    debounce(() => {
-      setSearchParams((params) => {
-        params.set('perPage', String(toSet));
-        return params;
-      });
-    });
   }, []);
 
-  const changeNameParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchName(value);
-    debounce(() => {
-      setSearchParams((params) => {
-        value ? params.set('name', value) : params.delete('name');
-        return params;
-      });
-    });
+  const onNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
   }, []);
 
-  const changeYearParam = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchYear(value);
-    debounce(() => {
-      setSearchParams((params) => {
-        value ? params.set('year', value) : params.delete('year');
-        return params;
-      });
-    });
+  const onYearLeftChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setYearLeft(e.target.value);
   }, []);
 
-  const changeRatingParam = useCallback(
-    (options: MultiValue<{ label: string; value: string }>) => {
-      const value =
-        options.length > 1
-          ? options.map((o) => o.value).join('&ageRating=+')
-          : options.at(0)?.value || '';
-      setSearchAgeRating(value);
-      setSearchParams((params) => {
-        value ? params.set('ageRating', value) : params.delete('ageRating');
-        return params;
-      });
+  const onYearRightChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setYearRight(e.target.value);
+  }, []);
+
+  const onAgeRatingChange = useCallback(
+    (options: MultiValue<{ label: number; value: number }>) => {
+      let value: string;
+      if (options.length > 1) {
+        const sortedRating = options.map((o) => o.value).sort((a, b) => a - b);
+        value = `${sortedRating.at(0)}-${sortedRating.at(options.length - 1)}`;
+      } else {
+        value = String(options.at(0)?.value || '');
+      }
+      setAgeRating(value);
     },
     [],
   );
 
-  const changeCountryParam = useCallback(
+  const onCountryChange = useCallback(
     (options: MultiValue<{ label: string; value: string }>) => {
       const value =
         options.length > 1
           ? options.map((o) => o.value).join('&countries.name=+')
           : options.at(0)?.value || '';
       setSearchCountry(value);
-      setSearchParams((params) => {
-        value ? params.set('country', value) : params.delete('country');
-        return params;
-      });
     },
     [],
   );
 
+  const onClearHistory = useCallback(() => {
+    localStorage.removeItem(MOVIE_SEARCH_QUERY_HISTORY);
+    setSearchHistory([]);
+  }, []);
+
+  const renderedList = debouncedName ? nameFilteredMovieList : movieList;
+  const foundSome = !isError && renderedList && renderedList?.docs.length > 0;
+
   return (
     <Container fluid>
+      <ol>
+        {searchHistory.length > 0 && (
+          <>
+            <p>История запросов:</p>
+            {searchHistory
+              .map((query) => new URLSearchParams(query))
+              .map((params) => {
+                return [
+                  { paramName: 'name', label: 'Название' },
+                  { paramName: 'countries.name', label: 'Страны' },
+                  { paramName: 'year', label: 'Года' },
+                  { paramName: 'ageRating', label: 'Возрастной рейтинг' },
+                ]
+                  .filter((r) => params.get(r.paramName))
+                  .map((r) => `${r.label}: ${params.getAll(r.paramName)}`)
+                  .join(' | ');
+              })
+              .map((record, idx) => (
+                <li key={`${record}-${idx}`}>{record}</li>
+              ))}
+          </>
+        )}
+      </ol>
+      {searchHistory.length > 0 && (
+        <Button className="mb-4" onClick={onClearHistory}>
+          Очистить историю
+        </Button>
+      )}
+      <Button className="d-block mb-4">Поделиться выдачей</Button>
       <Button onClick={resetFilters} className="mb-4">
         Сбросить фильтры
       </Button>
@@ -192,7 +232,7 @@ export const MainPage = () => {
             type="number"
             min={1}
             max={total}
-            onChange={changePerPageParam}
+            onChange={onPerPageChange}
             value={itemsPerPage}
           />
         </FormGroup>
@@ -201,80 +241,94 @@ export const MainPage = () => {
           <FormControl
             placeholder="Введите поисковой запрос..."
             type="text"
-            value={searchName}
-            onChange={changeNameParam}
+            value={name}
+            onChange={onNameChange}
           />
         </FormGroup>
         <FormGroup>
           <FormLabel>Фильтры:</FormLabel>
-          <Row className="px-3 gap-3 justify-content-center">
-            <Col xs="12" lg="auto" className="flex-grow-1">
-              <Col>
-                <FormControl
-                  id="search-year"
-                  onChange={changeYearParam}
-                  type="number"
-                  placeholder="Год"
-                  min={minYear}
-                  max={maxYear}
-                  value={searchYear}
-                />
-              </Col>
+          <Row className="px-3 gap-2 justify-content-center">
+            <Col xs="12" lg="auto" className="d-flex gap-2 align-items-center">
+              Года:
+              <FormControl
+                id="search-year-left"
+                onChange={onYearLeftChange}
+                type="number"
+                placeholder="от"
+                min={minYear}
+                max={maxYear}
+                value={yearLeft}
+              />
+              <FormControl
+                id="search-year-right"
+                onChange={onYearRightChange}
+                type="number"
+                placeholder="до"
+                min={minYear}
+                max={maxYear}
+                value={yearRight}
+              />
             </Col>
-            <Col>
+            <Col xs="12">
               <Select
                 className="w-100"
                 isMulti
-                onChange={changeCountryParam}
+                onChange={onCountryChange}
                 placeholder="Страны производства"
-                options={countries.map((c) => ({ label: c, value: c }))}
+                options={countries.map(({ name }) => ({
+                  label: name,
+                  value: name,
+                }))}
                 noOptionsMessage={() => 'Стран не найдено'}
                 styles={{
                   menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
+                value={countries
+                  .filter(({ name }) => pickedCountriesSet.has(name))
+                  .map(({ name }) => ({ label: name, value: name }))}
                 defaultValue={countries
-                  .filter((c) => searchCountry.includes(c))
-                  .map((c) => ({ label: c, value: c }))}
+                  .filter(({ name }) => pickedCountriesSet.has(name))
+                  .map(({ name }) => ({ label: name, value: name }))}
               />
             </Col>
-            <Col>
+            <Col xs="12">
               <Select
                 className="w-100"
                 isMulti
-                onChange={changeRatingParam}
+                onChange={onAgeRatingChange}
                 placeholder="Возрастной рейтинг"
                 options={ageRatings.map((r) => ({ label: r, value: r }))}
                 noOptionsMessage={() => 'Значений не найдено'}
                 styles={{
                   menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
+                value={ageRatings
+                  .filter((r) => ageRating.includes(String(r)))
+                  .map((r) => ({ label: r, value: r }))}
                 defaultValue={ageRatings
-                  .filter((r) =>
-                    searchAgeRating.includes(String(parseInt(r, 10))),
-                  )
+                  .filter((r) => ageRating.includes(String(r)))
                   .map((r) => ({ label: r, value: r }))}
               />
             </Col>
           </Row>
         </FormGroup>
-        <BigPagination
-          entityName="moviesPagination"
-          className="justify-content-center"
-          currentPage={currentPage || 1}
-          itemsPerPage={itemsPerPage}
-          total={total}
-          onPageChange={setCurrentPage}
-        />
+        {renderedList && (
+          <BigPagination
+            entityName="moviesPagination"
+            className="justify-content-center"
+            currentPage={currentPage || 1}
+            itemsPerPage={itemsPerPage}
+            pagesCount={renderedList.pages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </Form>
-      {isFetchingMainList ? (
+      {isFetching ? (
         <Spinner />
       ) : (
         <ul className="d-flex flex-wrap justify-content-center list-unstyled gap-4">
-          {movieList &&
-          !isError &&
-          filteredByName?.length &&
-          filteredByName.length > 0
-            ? filteredByName?.map((movie) => (
+          {foundSome
+            ? renderedList.docs.map((movie) => (
                 <li key={movie.id}>
                   <MovieCard
                     className="h-100"
@@ -282,10 +336,10 @@ export const MainPage = () => {
                     search={{
                       page: currentPage,
                       perPage: itemsPerPage,
-                      name: searchName,
-                      year: searchYear,
                       country: searchCountry,
-                      ageRating: searchAgeRating,
+                      name,
+                      year,
+                      ageRating,
                     }}
                   />
                 </li>
@@ -296,7 +350,7 @@ export const MainPage = () => {
       )}
       {isError && (
         <p className="text-danger fs-3">
-          Ошибка загрузки фильмов, повторите попытку позже.
+          Ошибка загрузки фильмов, повторите позже или измените фильтры.
         </p>
       )}
     </Container>

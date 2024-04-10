@@ -4,8 +4,9 @@ export {
   useRandomMovieQuery,
   useGetReviewsByMovieIdQuery,
   useGetMovieByIdQuery,
+  useGetMovieByNameQuery,
 } from './api/movieApi';
 
-export { Movie, LinkedMovie } from './model/types/movie';
+export { Movie, LinkedMovie, Review } from './model/types/movie';
 
 export { MovieCard } from './ui/MovieCard';

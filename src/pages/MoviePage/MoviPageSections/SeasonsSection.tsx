@@ -19,7 +19,7 @@ export const SeasonsSection = ({
       <h2 className="text-center">Сезоны</h2>
       <Pagination
         entityName="seasonsPagination"
-        total={seasonsInfo.length}
+        pagesCount={seasonsInfo.length}
         itemsPerPage={1}
         onPageChange={onPageChange}
         currentPage={currentPage}

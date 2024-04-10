@@ -40,7 +40,10 @@ export const MovieCard = ({ className, movie, search }: MovieCardProps) => {
           to={RoutePaths.movie.replace(RouteParams.movieId, String(id))}
         >
           <CardText>
-            {alternativeName ? `${name} | ${alternativeName}` : name} ({year})
+            {alternativeName && name
+              ? `${name} | ${alternativeName}`
+              : name || alternativeName}{' '}
+            ({year})
           </CardText>
         </Link>
         <CardText className="text-secondary">

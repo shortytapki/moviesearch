@@ -1,25 +1,65 @@
-import type { Movie } from '@entities/Movie';
+import type { Review } from '@entities/Movie';
+import { BigPagination } from '@shared/ui';
 import classNames from 'classnames';
+import { Card, CardBody, CardText, CardTitle } from 'react-bootstrap';
 
 interface ReviewsSectionProps {
   className?: string;
-  movie: Movie;
+  reviews: Review[];
+  pagesCount: number;
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
 }
 
-export const ReviewsSection = ({ className, movie }: ReviewsSectionProps) => {
-  const { reviewInfo } = movie;
-  const hasReviews =
-    reviewInfo?.count || reviewInfo?.percentage || reviewInfo?.positiveCount;
+export const ReviewsSection = ({
+  className,
+  reviews,
+  pagesCount,
+  limit,
+  page,
+  onPageChange,
+}: ReviewsSectionProps) => {
   return (
     <section className={classNames('text-center', className)}>
       <h2>Отзывы:</h2>
-      {hasReviews ? (
+      {reviews.length ? (
         <>
-          {reviewInfo?.count && <p>Всего: {reviewInfo?.count}</p>}
-          {reviewInfo?.positiveCount && (
-            <p>Положительных: {reviewInfo?.positiveCount}</p>
-          )}
-          {reviewInfo?.percentage && <p>Процент: {reviewInfo?.percentage}%</p>}
+          <BigPagination
+            entityName="reviewsPaginationTop"
+            pagesCount={pagesCount}
+            onPageChange={onPageChange}
+            currentPage={page}
+            itemsPerPage={limit}
+          />
+          <ul className="d-flex flex-column gap-3 list-unstyled">
+            {reviews.map(({ id, type, title, review, author }) => (
+              <li key={id}>
+                <Card>
+                  <CardBody>
+                    <CardTitle>
+                      {title} | Автор: {author}
+                    </CardTitle>
+                    <CardText
+                      className={classNames({
+                        'text-success': type === 'Позитивный',
+                        'text-danger': type === 'Отрицательный',
+                      })}
+                    >
+                      {review}
+                    </CardText>
+                  </CardBody>
+                </Card>
+              </li>
+            ))}
+          </ul>
+          <BigPagination
+            entityName="reviewsPaginationBot"
+            pagesCount={pagesCount}
+            onPageChange={onPageChange}
+            currentPage={page}
+            itemsPerPage={limit}
+          />
         </>
       ) : (
         'Отзывов пока нет...'
