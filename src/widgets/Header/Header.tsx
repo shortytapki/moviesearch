@@ -4,7 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@app/providers/store/config/store';
+import { useAppDispatch } from '@app/providers/store';
 import { getUsername, userActions } from '@entities/User';
 import { RoutePaths } from '@shared/config/routeConfig';
 import { MOVIE_SEARCH_USER } from '@shared/consts';

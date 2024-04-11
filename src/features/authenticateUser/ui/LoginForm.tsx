@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { Button, FormControl, Spinner, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from '@app/providers/store/config/store';
+import { useAppDispatch } from '@app/providers/store';
 import { getError, getIsLoggingIn } from '@entities/User';
 import { loginByUsername } from '../api/authenticateUser';
 
