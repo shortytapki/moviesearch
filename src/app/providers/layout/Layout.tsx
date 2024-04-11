@@ -1,5 +1,5 @@
-import { Header } from '@widgets/Header/Header';
 import type { FC, PropsWithChildren } from 'react';
+import { Header } from '@widgets/Header/Header';
 
 export const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (

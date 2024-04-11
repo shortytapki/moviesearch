@@ -1,11 +1,11 @@
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { MOVIE_SEARCH_QUERY_HISTORY } from '@shared/consts/consts';
+import { getUserInitialized, userActions } from '@entities/User';
 import { AppRouter } from './providers/router/AppRouter';
 import { Layout } from './providers/layout/Layout';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect } from 'react';
-import { MOVIE_SEARCH_QUERY_HISTORY } from '@shared/consts/consts';
 import { useAppDispatch } from './providers/store/config/store';
-import { getUserInitialized, userActions } from '@entities/User';
-import { useSelector } from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export const App = () => {
   const dispatch = useAppDispatch();

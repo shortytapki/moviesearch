@@ -1,10 +1,10 @@
 import { Container } from 'react-bootstrap';
-import { LoginForm } from '../../features/authenticateUser/ui/LoginForm';
 import { Link, useNavigate } from 'react-router-dom';
-import { RoutePaths } from '@shared/config/routeConfig';
 import { useSelector } from 'react-redux';
-import { getUsername } from '@entities/User';
 import { useEffect } from 'react';
+import { RoutePaths } from '@shared/config/routeConfig';
+import { getUsername } from '@entities/User';
+import { LoginForm } from '../../features/authenticateUser/ui/LoginForm';
 
 export default function LoginPage() {
   const username = useSelector(getUsername);

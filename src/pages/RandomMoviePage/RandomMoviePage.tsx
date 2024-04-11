@@ -1,12 +1,12 @@
+import { useEffect, useState } from 'react';
+import { Button, Container, Form, FormLabel, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 import { useRandomMovieQuery } from '@entities/Movie';
 import { REFETCH_ATTEMPTS, getQueryString } from '@pages/MainPage/utils/utils';
 import { RouteParams, RoutePaths } from '@shared/config';
 import { countries } from '@shared/consts';
 import { genres, networks } from '@shared/consts/consts';
-import { useEffect, useState } from 'react';
-import { Button, Container, Form, FormLabel, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';
 
 export default function RandomMoviePage() {
   const [fetchCount, setFetchCount] = useState(1);

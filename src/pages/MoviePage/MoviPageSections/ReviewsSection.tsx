@@ -1,7 +1,7 @@
-import type { Review } from '@entities/Movie';
-import { BigPagination } from '@shared/ui';
 import classNames from 'classnames';
 import { Card, CardBody, CardText, CardTitle } from 'react-bootstrap';
+import type { Review } from '@entities/Movie';
+import { BigPagination } from '@shared/ui';
 
 interface ReviewsSectionProps {
   className?: string;

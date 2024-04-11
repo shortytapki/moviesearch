@@ -1,10 +1,9 @@
-import { useAppDispatch } from '@app/providers/store/config/store';
 import { type FormEvent, useState } from 'react';
-import { Button, FormControl, Spinner } from 'react-bootstrap';
-import { Form } from 'react-bootstrap';
-import { loginByUsername } from '../api/authenticateUser';
+import { Button, FormControl, Spinner, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { useAppDispatch } from '@app/providers/store/config/store';
 import { getError, getIsLoggingIn } from '@entities/User';
+import { loginByUsername } from '../api/authenticateUser';
 
 interface LoginFormProps {
   className?: string;

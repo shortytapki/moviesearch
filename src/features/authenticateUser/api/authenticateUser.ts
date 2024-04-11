@@ -1,6 +1,6 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { ThunkConfig } from '@app/providers/store/config/thunk';
 import type { User } from '@entities/User';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RoutePaths } from '@shared/config/routeConfig';
 import { MOVIE_SEARCH_USER } from '@shared/consts/consts';
 

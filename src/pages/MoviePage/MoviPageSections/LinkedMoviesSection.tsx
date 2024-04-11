@@ -1,8 +1,8 @@
+import { Link } from 'react-router-dom';
+import { Carousel, Image, Row } from 'react-bootstrap';
 import type { Movie } from '@entities/Movie';
 import { RouteParams, RoutePaths } from '@shared/config/routeConfig';
-import { Carousel, Image } from 'react-bootstrap';
-import { Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+
 interface LinkedMoviesProps {
   movie: Movie;
 }

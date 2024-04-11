@@ -5,10 +5,10 @@ import {
   type CardProps,
   CardText,
 } from 'react-bootstrap';
-import type { Movie } from '../model/types/movie';
 import { Link } from 'react-router-dom';
-import { RouteParams, RoutePaths } from '@shared/config/routeConfig';
 import classNames from 'classnames';
+import { RouteParams, RoutePaths } from '@shared/config/routeConfig';
+import type { Movie } from '../model/types/movie';
 
 interface MovieCardProps extends CardProps {
   movie: Movie;

@@ -1,5 +1,3 @@
-import { movieApi } from '@entities/Movie';
-import { userReducer, userReducerPath } from '@entities/User';
 import {
   combineReducers,
   configureStore,
@@ -9,6 +7,8 @@ import {
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
 import type { NavigateFunction } from 'react-router-dom';
+import { userReducer, userReducerPath } from '@entities/User';
+import { movieApi } from '@entities/Movie';
 
 export const createMainStore = (navigate: NavigateFunction) => {
   const store = configureStore({

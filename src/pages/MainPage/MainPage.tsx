@@ -1,11 +1,5 @@
 import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
 import {
-  MovieCard,
-  useGetMovieByNameQuery,
-  useGetMoviesQuery,
-} from '@entities/Movie';
-import { BigPagination } from '@shared/ui';
-import {
   Container,
   Form,
   FormControl,
@@ -16,21 +10,27 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
+import Select, { type MultiValue } from 'react-select';
+import classNames from 'classnames';
+import {
+  MovieCard,
+  useGetMovieByNameQuery,
+  useGetMoviesQuery,
+} from '@entities/Movie';
+import { BigPagination } from '@shared/ui';
 import {
   MOVIE_SEARCH_QUERY_HISTORY,
   countries,
   maxYear,
   minYear,
 } from '@shared/consts/consts';
-import { useLocation } from 'react-router-dom';
 import { useDebounce } from '@shared/lib/useDebounce';
 import {
   REFETCH_ATTEMPTS,
   getQueryString,
   updateLastQueryHistory,
 } from './utils/utils';
-import Select, { type MultiValue } from 'react-select';
-import classNames from 'classnames';
 
 export interface MainPageFilters {
   name: string;

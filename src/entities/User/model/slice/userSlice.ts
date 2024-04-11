@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { User } from '../types/user';
 import { loginByUsername, register } from '@features/authenticateUser';
 import { MOVIE_SEARCH_USER } from '@shared/consts';
+import type { User } from '../types/user';
 
 export interface UserSchema extends User {
   isLoggingIn: boolean;

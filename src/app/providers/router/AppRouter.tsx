@@ -1,8 +1,7 @@
 import { Spinner } from 'react-bootstrap';
-import { AppRoutes, RoutePaths } from '@shared/config/routeConfig';
 import { Route, type RouteProps, Routes } from 'react-router-dom';
 import { Suspense, memo, useCallback } from 'react';
-import { RequireAuth } from './RequireAuth';
+import { AppRoutes, RoutePaths } from '@shared/config/routeConfig';
 import {
   LoginPage,
   MainPage,
@@ -10,6 +9,7 @@ import {
   RegisterPage,
   RandomMoviePage,
 } from '@pages';
+import { RequireAuth } from './RequireAuth';
 
 type AppRouteProps = RouteProps & { authOnly?: boolean };
 
