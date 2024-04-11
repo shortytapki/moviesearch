@@ -30,6 +30,7 @@ import {
   updateLastQueryHistory,
 } from './utils/utils';
 import Select, { type MultiValue } from 'react-select';
+import classNames from 'classnames';
 
 export interface MainPageFilters {
   name: string;
@@ -50,7 +51,7 @@ export const MainPage = () => {
   );
 
   const [itemsPerPage, setItemsPerPage] = useState(
-    Number(searchParams.get('perPage')) || 10,
+    Number(searchParams.get('limit')) || 10,
   );
 
   const [name, setName] = useState(searchParams.get('name') || '');
@@ -68,9 +69,13 @@ export const MainPage = () => {
     searchParams.get('ageRating') || '',
   );
 
-  const [fetchCount, setFetchCount] = useState(1);
+  const [linkCopyStatus, setlinkCopyStatus] = useState<
+    '' | 'success' | 'error'
+  >('');
 
+  const [fetchCount, setFetchCount] = useState(1);
   const pickedCountriesSet = new Set(searchCountry.split('&countries.name=+'));
+  const pickedRatingsSet = new Set(ageRating.split('-'));
   const debouncedYear = useDebounce(year);
   const debouncedName = useDebounce(name);
   const debouncedPerPage = useDebounce(itemsPerPage);
@@ -188,6 +193,19 @@ export const MainPage = () => {
     setSearchHistory([]);
   }, []);
 
+  const onCopyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        window.location.origin + `/?${query}`,
+      );
+      setlinkCopyStatus('success');
+    } catch (e) {
+      setlinkCopyStatus('error');
+    } finally {
+      setTimeout(() => setlinkCopyStatus(''), 3000);
+    }
+  };
+
   const renderedList = debouncedName ? nameFilteredMovieList : movieList;
   const foundSome = !isError && renderedList && renderedList?.docs.length > 0;
 
@@ -221,7 +239,21 @@ export const MainPage = () => {
           Очистить историю
         </Button>
       )}
-      <Button className="d-block mb-4">Поделиться выдачей</Button>
+      <Button className="d-block mb-4" onClick={onCopyShareLink}>
+        Скопировать ссылку на выдачу
+      </Button>
+      {linkCopyStatus && (
+        <p
+          className={classNames('mb-4', {
+            'text-success': linkCopyStatus === 'success',
+            'text-danger': linkCopyStatus === 'error',
+          })}
+        >
+          {linkCopyStatus === 'success'
+            ? 'Ссылка скопирована в буфер обмена'
+            : 'Не удалось скопировать ссылку.'}
+        </p>
+      )}
       <Button onClick={resetFilters} className="mb-4">
         Сбросить фильтры
       </Button>
@@ -303,10 +335,10 @@ export const MainPage = () => {
                   menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
                 value={ageRatings
-                  .filter((r) => ageRating.includes(String(r)))
+                  .filter((r) => pickedRatingsSet.has(String(r)))
                   .map((r) => ({ label: r, value: r }))}
                 defaultValue={ageRatings
-                  .filter((r) => ageRating.includes(String(r)))
+                  .filter((r) => pickedRatingsSet.has(String(r)))
                   .map((r) => ({ label: r, value: r }))}
               />
             </Col>
@@ -333,14 +365,7 @@ export const MainPage = () => {
                   <MovieCard
                     className="h-100"
                     movie={movie}
-                    search={{
-                      page: currentPage,
-                      perPage: itemsPerPage,
-                      country: searchCountry,
-                      name,
-                      year,
-                      ageRating,
-                    }}
+                    query={`?page=${currentPage}&limit=${itemsPerPage}${query}`}
                   />
                 </li>
               ))

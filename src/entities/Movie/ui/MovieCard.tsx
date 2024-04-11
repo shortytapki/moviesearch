@@ -9,14 +9,13 @@ import type { Movie } from '../model/types/movie';
 import { Link } from 'react-router-dom';
 import { RouteParams, RoutePaths } from '@shared/config/routeConfig';
 import classNames from 'classnames';
-import type { MainPageFilters } from '@pages';
 
 interface MovieCardProps extends CardProps {
   movie: Movie;
-  search: MainPageFilters;
+  query: string;
 }
 
-export const MovieCard = ({ className, movie, search }: MovieCardProps) => {
+export const MovieCard = ({ className, movie, query }: MovieCardProps) => {
   const { name, logo, poster, id, backdrop, year, alternativeName, rating } =
     movie;
   return (
@@ -36,7 +35,7 @@ export const MovieCard = ({ className, movie, search }: MovieCardProps) => {
       />
       <CardBody>
         <Link
-          state={{ search }}
+          state={{ query }}
           to={RoutePaths.movie.replace(RouteParams.movieId, String(id))}
         >
           <CardText>
