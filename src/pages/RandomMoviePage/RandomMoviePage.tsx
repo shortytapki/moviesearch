@@ -3,10 +3,14 @@ import { Button, Container, Form, FormLabel, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { useRandomMovieQuery } from '@entities/Movie';
-import { REFETCH_ATTEMPTS, getQueryString } from '@pages/MainPage/utils/utils';
+import { getQueryString } from '@shared/lib';
 import { RouteParams, RoutePaths } from '@shared/config';
-import { countries } from '@shared/consts';
-import { genres, networks } from '@shared/consts/consts';
+import {
+  COUNTRIES,
+  GENRES,
+  MAX_REFETCH_ATTEMPTS,
+  NETWORKS,
+} from '@shared/consts';
 
 export default function RandomMoviePage() {
   const [fetchCount, setFetchCount] = useState(1);
@@ -54,14 +58,14 @@ export default function RandomMoviePage() {
   }, [isFetching, data]);
 
   useEffect(() => {
-    if (isError && fetchCount < REFETCH_ATTEMPTS) {
+    if (isError && fetchCount < MAX_REFETCH_ATTEMPTS) {
       queryIsReady && refetch();
       setFetchCount(fetchCount + 1);
     }
   }, [isFetching, queryIsReady, isError]);
 
   const fullError =
-    isError || Boolean(error) || fetchCount === REFETCH_ATTEMPTS;
+    isError || Boolean(error) || fetchCount === MAX_REFETCH_ATTEMPTS;
   return (
     <Container fluid>
       <Form>
@@ -70,7 +74,7 @@ export default function RandomMoviePage() {
           isMulti
           className="mb-3"
           placeholder="Страны производства"
-          options={countries.map((country) => ({
+          options={COUNTRIES.map((country) => ({
             label: country.name,
             value: country.name,
           }))}
@@ -82,7 +86,7 @@ export default function RandomMoviePage() {
           isMulti
           className="mb-3"
           placeholder="Сети производства фильма"
-          options={networks.map((network) => ({
+          options={NETWORKS.map((network) => ({
             label: network,
             value: network,
           }))}
@@ -94,7 +98,7 @@ export default function RandomMoviePage() {
           isMulti
           className="mb-3"
           placeholder="Жанры"
-          options={genres.map(({ slug, name }) => ({
+          options={GENRES.map(({ slug, name }) => ({
             label: name,
             value: slug,
           }))}

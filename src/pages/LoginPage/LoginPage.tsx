@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { RoutePaths } from '@shared/config/routeConfig';
 import { getUsername } from '@entities/User';
-import { LoginForm } from '../../features/authenticateUser/ui/LoginForm';
+import { LoginForm } from '@features/authenticateUser';
 
 export default function LoginPage() {
   const username = useSelector(getUsername);

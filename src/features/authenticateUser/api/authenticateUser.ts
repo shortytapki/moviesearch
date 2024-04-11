@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { ThunkConfig } from '@app/providers/store/config/thunk';
 import type { User } from '@entities/User';
 import { RoutePaths } from '@shared/config/routeConfig';
-import { MOVIE_SEARCH_USER } from '@shared/consts/consts';
+import { MOVIE_SEARCH_USER } from '@shared/consts';
 
 export const loginByUsername = createAsyncThunk<
   User,

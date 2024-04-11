@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Container,
   Image,
@@ -14,6 +14,7 @@ import {
   useGetReviewsByMovieIdQuery,
 } from '@entities/Movie';
 import { RoutePaths } from '@shared/config/routeConfig';
+import { MAX_REFETCH_ATTEMPTS } from '@shared/consts';
 import { ActorsSection } from './MoviPageSections/ActorsSection';
 import { SeasonsSection } from './MoviPageSections/SeasonsSection';
 import { LinkedMovies } from './MoviPageSections/LinkedMoviesSection';
@@ -22,6 +23,7 @@ import { ReviewsSection } from './MoviPageSections/ReviewsSection';
 export default function MoviePage() {
   const location = useLocation();
   const query = location.state?.query || '';
+  const [fetchCount, setFetchCount] = useState(1);
   const [actorsPage, setActorsPage] = useState(1);
   const [seasonsPage, setSeasonsPage] = useState(1);
   const [reviewsPage, setReviewsPage] = useState(1);
@@ -33,6 +35,8 @@ export default function MoviePage() {
     data: movie,
     isSuccess,
     isFetching,
+    isError,
+    refetch,
   } = useGetMovieByIdQuery(directId || '');
 
   const { data: reviews } = useGetReviewsByMovieIdQuery({
@@ -40,9 +44,15 @@ export default function MoviePage() {
     limit: reviewsLimit,
     query: directId,
   });
+  useEffect(() => {
+    if (fetchCount < MAX_REFETCH_ATTEMPTS && isError) {
+      refetch();
+      setFetchCount(fetchCount + 1);
+    }
+  }, [isError]);
 
+  if (!isSuccess || !directId) return <h1>Фильм с указанным id не найден.</h1>;
   if (isFetching) return <Spinner size="sm" />;
-  if (!isSuccess) return <h1>Фильм с указанным id не найден.</h1>;
 
   const { alternativeName, name, description, rating, poster, logo, backdrop } =
     movie;

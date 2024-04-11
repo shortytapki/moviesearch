@@ -21,16 +21,13 @@ import {
 import { BigPagination } from '@shared/ui';
 import {
   MOVIE_SEARCH_QUERY_HISTORY,
-  countries,
-  maxYear,
-  minYear,
-} from '@shared/consts/consts';
+  COUNTRIES,
+  MAX_YEAR,
+  MIN_YEAR,
+  MAX_REFETCH_ATTEMPTS,
+} from '@shared/consts';
 import { useDebounce } from '@shared/lib/useDebounce';
-import {
-  REFETCH_ATTEMPTS,
-  getQueryString,
-  updateLastQueryHistory,
-} from './utils/utils';
+import { getQueryString, updateLastQueryHistory } from '@shared/lib';
 
 export interface MainPageFilters {
   name: string;
@@ -120,6 +117,7 @@ export const MainPage = () => {
     data: nameFilteredMovieList,
     isError: nameFilteredMovieListError,
     isFetching: isFethcingNameFilteredList,
+    refetch: refetchNameFilteredList,
   } = useGetMovieByNameQuery(
     {
       page: currentPage,
@@ -143,8 +141,8 @@ export const MainPage = () => {
   }, [query, debouncedName]);
 
   useEffect(() => {
-    if (fetchCount < REFETCH_ATTEMPTS && isError) {
-      refetchMovieList();
+    if (fetchCount < MAX_REFETCH_ATTEMPTS && isError) {
+      debouncedName ? refetchNameFilteredList() : refetchMovieList();
       setFetchCount(fetchCount + 1);
     }
   }, [isError]);
@@ -287,8 +285,8 @@ export const MainPage = () => {
                 onChange={onYearLeftChange}
                 type="number"
                 placeholder="от"
-                min={minYear}
-                max={maxYear}
+                min={MIN_YEAR}
+                max={MAX_YEAR}
                 value={yearLeft}
               />
               <FormControl
@@ -296,8 +294,8 @@ export const MainPage = () => {
                 onChange={onYearRightChange}
                 type="number"
                 placeholder="до"
-                min={minYear}
-                max={maxYear}
+                min={MIN_YEAR}
+                max={MAX_YEAR}
                 value={yearRight}
               />
             </Col>
@@ -307,7 +305,7 @@ export const MainPage = () => {
                 isMulti
                 onChange={onCountryChange}
                 placeholder="Страны производства"
-                options={countries.map(({ name }) => ({
+                options={COUNTRIES.map(({ name }) => ({
                   label: name,
                   value: name,
                 }))}
@@ -315,12 +313,12 @@ export const MainPage = () => {
                 styles={{
                   menu: (base) => ({ ...base, zIndex: '999!important' }),
                 }}
-                value={countries
-                  .filter(({ name }) => pickedCountriesSet.has(name))
-                  .map(({ name }) => ({ label: name, value: name }))}
-                defaultValue={countries
-                  .filter(({ name }) => pickedCountriesSet.has(name))
-                  .map(({ name }) => ({ label: name, value: name }))}
+                value={COUNTRIES.filter(({ name }) =>
+                  pickedCountriesSet.has(name),
+                ).map(({ name }) => ({ label: name, value: name }))}
+                defaultValue={COUNTRIES.filter(({ name }) =>
+                  pickedCountriesSet.has(name),
+                ).map(({ name }) => ({ label: name, value: name }))}
               />
             </Col>
             <Col xs="12">

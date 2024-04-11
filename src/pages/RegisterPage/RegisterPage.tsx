@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { getUsername } from '@entities/User';
-import { RegisterForm } from '@features/authenticateUser/ui/RegisterForm';
+import { RegisterForm } from '@features/authenticateUser';
 import { RoutePaths } from '@shared/config/routeConfig';
 
 export default function RegisterPage() {

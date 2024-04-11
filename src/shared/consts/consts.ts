@@ -1,4 +1,4 @@
-export const countries = [
+export const COUNTRIES = [
   {
     name: 'Австралия',
     slug: 'Avstraliya',
@@ -953,7 +953,7 @@ export const countries = [
   },
 ];
 
-export const genres = [
+export const GENRES = [
   {
     name: 'аниме',
     slug: 'anime',
@@ -1084,7 +1084,7 @@ export const genres = [
   },
 ];
 
-export const networks = [
+export const NETWORKS = [
   'HBO',
   'Amazon',
   'Netflix',
@@ -1094,7 +1094,9 @@ export const networks = [
   'Disney+',
 ];
 
-export const minYear = 1874;
-export const maxYear = 2050;
+export const SAVED_QUERIES_AMOUNT = 20;
+export const MAX_REFETCH_ATTEMPTS = 3;
+export const MIN_YEAR = 1874;
+export const MAX_YEAR = 2050;
 export const MOVIE_SEARCH_USER = 'MOVIE_SEARCH_USER';
 export const MOVIE_SEARCH_QUERY_HISTORY = 'MOVIE_SEARCH_QUERY_HISTORY';
