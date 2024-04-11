@@ -36,7 +36,7 @@ export const Header = () => {
             {username ? (
               <>
                 <Nav.Link href={RoutePaths.randomMovie}>
-                  Случайный фильм
+                  Найти случайный тайтл
                 </Nav.Link>
                 <Nav.Link onClick={onLogOut}>Выйти</Nav.Link>
               </>

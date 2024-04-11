@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom';
 import { useDebounce } from '@shared/lib/useDebounce';
 import {
   REFETCH_ATTEMPTS,
-  createFilterQueryString,
+  getQueryString,
   updateLastQueryHistory,
 } from './utils/utils';
 import Select, { type MultiValue } from 'react-select';
@@ -61,8 +61,8 @@ export const MainPage = () => {
   const year =
     yearLeft && yearRight ? `${yearLeft}-${yearRight}` : yearLeft || yearRight;
 
-  const [searchCountry, setSearchCountry] = useState(
-    searchParams.get('country') || '',
+  const [searchCountry, setSearchCountry] = useState<string[]>(
+    searchParams.getAll('countries.name').map((c) => c.replace('+', '')) || [],
   );
 
   const [ageRating, setAgeRating] = useState(
@@ -74,40 +74,47 @@ export const MainPage = () => {
   >('');
 
   const [fetchCount, setFetchCount] = useState(1);
-  const pickedCountriesSet = new Set(searchCountry.split('&countries.name=+'));
+  const pickedCountriesSet = new Set(searchCountry);
   const pickedRatingsSet = new Set(ageRating.split('-'));
   const debouncedYear = useDebounce(year);
   const debouncedName = useDebounce(name);
   const debouncedPerPage = useDebounce(itemsPerPage);
 
   const resetFilters = () => {
-    [
-      setName,
-      setYearLeft,
-      setYearRight,
-      setSearchCountry,
-      setAgeRating,
-    ].forEach((setter) => setter(''));
+    [setName, setYearLeft, setYearRight, setAgeRating].forEach((setter) =>
+      setter(''),
+    );
     setItemsPerPage(10);
     setCurrentPage(1);
+    setSearchCountry([]);
   };
 
-  const query = createFilterQueryString({
-    ageRating,
-    'countries.name': searchCountry,
-    year: debouncedYear,
-  });
+  const countriesNameQuery = getQueryString('countries.name', searchCountry);
+  const ageRatingQuery = getQueryString('ageRating', ageRating);
+  const yearQuery = getQueryString('year', debouncedYear);
+  const pageQuery = getQueryString('page', String(currentPage));
+  const limitQuery = getQueryString('limit', String(debouncedPerPage));
+  const nameQuery = getQueryString('name', debouncedName);
+
+  const query =
+    '?' +
+    [
+      pageQuery,
+      limitQuery,
+      ageRatingQuery,
+      yearQuery,
+      countriesNameQuery,
+      nameQuery,
+    ]
+      .filter(Boolean)
+      .join('&');
 
   const {
     data: movieList,
     isFetching: isFetchingMainList,
     isError: movieListError,
     refetch: refetchMovieList,
-  } = useGetMoviesQuery({
-    page: currentPage,
-    limit: debouncedPerPage,
-    query,
-  });
+  } = useGetMoviesQuery(query);
 
   const {
     data: nameFilteredMovieList,
@@ -129,12 +136,9 @@ export const MainPage = () => {
   const ageRatings = [6, 12, 16, 18];
 
   useEffect(() => {
+    if (currentPage === 1 && itemsPerPage === 10) return;
     if (query || debouncedName) {
-      setSearchHistory(
-        updateLastQueryHistory(
-          `?${query}${debouncedName ? `&name=${debouncedName}` : ''}`,
-        ),
-      );
+      setSearchHistory(updateLastQueryHistory(query));
     }
   }, [query, debouncedName]);
 
@@ -179,11 +183,7 @@ export const MainPage = () => {
 
   const onCountryChange = useCallback(
     (options: MultiValue<{ label: string; value: string }>) => {
-      const value =
-        options.length > 1
-          ? options.map((o) => o.value).join('&countries.name=+')
-          : options.at(0)?.value || '';
-      setSearchCountry(value);
+      setSearchCountry(options.map((o) => o.value));
     },
     [],
   );
@@ -362,11 +362,7 @@ export const MainPage = () => {
           {foundSome
             ? renderedList.docs.map((movie) => (
                 <li key={movie.id}>
-                  <MovieCard
-                    className="h-100"
-                    movie={movie}
-                    query={`?page=${currentPage}&limit=${itemsPerPage}${query}`}
-                  />
+                  <MovieCard className="h-100" movie={movie} query={query} />
                 </li>
               ))
             : !isError &&

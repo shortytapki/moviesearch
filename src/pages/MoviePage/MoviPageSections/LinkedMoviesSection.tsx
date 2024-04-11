@@ -12,7 +12,7 @@ export const LinkedMovies = ({ movie }: LinkedMoviesProps) => {
   return (
     <section>
       <h2 className="text-center">Похожие фильмы и сериалы</h2>
-      {similarMovies ? (
+      {similarMovies && similarMovies.length ? (
         <Row className="justify-content-center">
           <Carousel className="w-50">
             {similarMovies.map((sm) => {
@@ -43,7 +43,7 @@ export const LinkedMovies = ({ movie }: LinkedMoviesProps) => {
           </Carousel>
         </Row>
       ) : (
-        'Похожих фильмов или сериалов не найдено.'
+        <p className="text-center">Похожих фильмов или сериалов не найдено.</p>
       )}
     </section>
   );

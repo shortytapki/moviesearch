@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import {
   Container,
@@ -20,6 +20,8 @@ import { LinkedMovies } from './MoviPageSections/LinkedMoviesSection';
 import { ReviewsSection } from './MoviPageSections/ReviewsSection';
 
 export default function MoviePage() {
+  const location = useLocation();
+  const query = location.state?.query || '';
   const [actorsPage, setActorsPage] = useState(1);
   const [seasonsPage, setSeasonsPage] = useState(1);
   const [reviewsPage, setReviewsPage] = useState(1);
@@ -56,7 +58,7 @@ export default function MoviePage() {
 
   return (
     <Container fluid>
-      <Link to={RoutePaths.main}>
+      <Link to={RoutePaths.main + query}>
         <Button className="mb-5">Назад к выдаче</Button>
       </Link>
       <article className="d-flex flex-column gap-5">

@@ -26,10 +26,10 @@ export const movieApi = createApi({
   reducerPath: 'movieApi',
   baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
   endpoints: (builder) => ({
-    getMovies: builder.query<MovieApiResponse, SearchParams>({
-      query: ({ limit, page, query }) => ({
+    getMovies: builder.query<MovieApiResponse, string>({
+      query: (query) => ({
         headers: { 'X-API-KEY': API_TOKEN },
-        url: `movie?page=${page}&limit=${limit}` + query,
+        url: 'movie' + query,
       }),
     }),
     getMovieByName: builder.query<MovieApiResponse, SearchParams>({

@@ -3,10 +3,15 @@ import { MOVIE_SEARCH_QUERY_HISTORY } from '@shared/consts/consts';
 const SAVED_QUERIES_AMOUNT = 20;
 export const REFETCH_ATTEMPTS = 3;
 
-export const createFilterQueryString = (filters: Record<string, string>) =>
-  Object.entries(filters)
-    .filter(([_, v]) => Boolean(v))
-    .reduce((acc, [k, v]) => acc + `&${k}=${v}`, '');
+export const getQueryString = (param: string, value: string | string[]) => {
+  if (!value || !value.length) return '';
+  if (typeof value === 'object') {
+    const separator = `&${param}=%2B`;
+    const joined = value.join(separator);
+    return value.length > 1 ? `${param}=%2B` + joined : `${param}=${value}`;
+  }
+  return `${param}=${value}`;
+};
 
 export const updateLastQueryHistory = (q?: string) => {
   const historyString = localStorage.getItem(MOVIE_SEARCH_QUERY_HISTORY);

@@ -31,7 +31,7 @@ export const MovieCard = ({ className, movie, query }: MovieCardProps) => {
           backdrop?.url ||
           ''
         }
-        alt={`Постер фильм ${name} не найден...`}
+        alt={`Постер фильма "${name}" не найден...`}
       />
       <CardBody>
         <Link

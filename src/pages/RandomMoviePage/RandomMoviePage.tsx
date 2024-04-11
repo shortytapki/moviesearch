@@ -1,11 +1,8 @@
 import { useRandomMovieQuery } from '@entities/Movie';
-import {
-  REFETCH_ATTEMPTS,
-  createFilterQueryString,
-} from '@pages/MainPage/utils/utils';
+import { REFETCH_ATTEMPTS, getQueryString } from '@pages/MainPage/utils/utils';
 import { RouteParams, RoutePaths } from '@shared/config';
 import { countries } from '@shared/consts';
-import { genres } from '@shared/consts/consts';
+import { genres, networks } from '@shared/consts/consts';
 import { useEffect, useState } from 'react';
 import { Button, Container, Form, FormLabel, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -20,21 +17,31 @@ export default function RandomMoviePage() {
   const [pickedCountries, setPickedCountries] = useState<string[]>([]);
   const [pickedGenres, setPickedGenres] = useState<string[]>([]);
 
+  const isSeriesQuery = getQueryString('isSeries', String(isSeries));
+  const ratingQuery = getQueryString('rating.kp', `${rating}-10`);
+  const countriesQuery = getQueryString('countries.name', pickedCountries);
+  const networksQuery = getQueryString('networks.items.name', pickedNetworks);
+  const genresQuery = getQueryString('genres.name', pickedGenres);
+
+  const query = [
+    isSeriesQuery,
+    ratingQuery,
+    countriesQuery,
+    networksQuery,
+    countriesQuery,
+    genresQuery,
+  ]
+    .filter(Boolean)
+    .join('&');
+
   const navigate = useNavigate();
-  const { data, isLoading, isError, refetch, error } = useRandomMovieQuery(
-    createFilterQueryString({
-      isSeries: String(isSeries),
-      rating,
-      'countries.name': pickedCountries.toString(),
-      'networks.items.name': pickedNetworks.toString(),
-      'rating.kp': rating,
-      'genres.name': pickedGenres.toString(),
-    }),
+  const { data, isFetching, isError, refetch, error } = useRandomMovieQuery(
+    query,
     { skip: !queryIsReady },
   );
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isFetching) {
       setQueryIsReady(false);
     }
     if (data) {
@@ -44,14 +51,14 @@ export default function RandomMoviePage() {
         },
       });
     }
-  }, [isLoading, data]);
+  }, [isFetching, data]);
 
   useEffect(() => {
     if (isError && fetchCount < REFETCH_ATTEMPTS) {
       queryIsReady && refetch();
       setFetchCount(fetchCount + 1);
     }
-  }, [isLoading, queryIsReady, isError]);
+  }, [isFetching, queryIsReady, isError]);
 
   const fullError =
     isError || Boolean(error) || fetchCount === REFETCH_ATTEMPTS;
@@ -75,9 +82,9 @@ export default function RandomMoviePage() {
           isMulti
           className="mb-3"
           placeholder="Сети производства фильма"
-          options={['HBO', 'Netflix', 'Amazon'].map((country) => ({
-            label: country,
-            value: country,
+          options={networks.map((network) => ({
+            label: network,
+            value: network,
           }))}
           onChange={(picked) =>
             setPickedNetworks(picked.map((option) => option.label))
@@ -121,7 +128,7 @@ export default function RandomMoviePage() {
           onChange={(e) => setRating(e.target.value)}
         />
       </Form>
-      {isLoading && !fullError ? (
+      {isFetching && !fullError ? (
         <>
           <Spinner /> выбираем {isSeries ? 'сериал' : 'фильм'}...
         </>
@@ -135,7 +142,7 @@ export default function RandomMoviePage() {
           Ошибка загрузки фильма, повторите попытку позже.
         </p>
       )}
-      {!isLoading && data === null && (
+      {!isFetching && data === null && (
         <p>По указанным фильтрам фильмов и сериалов не найдено...</p>
       )}
     </Container>
