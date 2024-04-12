@@ -95,7 +95,7 @@ export const MainPagination = (props: PaginationComponentProps) => {
   } = props;
   const pagesAmount = Math.ceil(pagesCount / itemsPerPage);
   return (
-    <Pagination className={className}>
+    <Pagination className={className} data-testId="mainPagination">
       <Pagination.First onClick={() => onPageChange(1)} />
       <Pagination.Prev
         onClick={() =>
@@ -109,6 +109,7 @@ export const MainPagination = (props: PaginationComponentProps) => {
             active={currentPage === idx + 1}
             key={`${entityName}-${idx}`}
             onClick={() => onPageChange(idx + 1)}
+            data-testId={idx + 1}
           >
             {idx + 1}
           </Pagination.Item>

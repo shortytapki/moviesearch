@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  moviesearch:
+    image: 'moviesearch-dev'
+    build:
+      dockerfile: Dockerfile
+    container_name: 'moviesearch-dev_c'
+    ports:
+      - '7070:7070'
+    network_mode: host
+    environment:
+      - TOKEN={TOKEN}
