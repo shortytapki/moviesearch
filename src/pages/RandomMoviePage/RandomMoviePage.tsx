@@ -22,7 +22,7 @@ export default function RandomMoviePage() {
   const [pickedGenres, setPickedGenres] = useState<string[]>([]);
 
   const isSeriesQuery = getQueryString('isSeries', String(isSeries));
-  const ratingQuery = getQueryString('rating.kp', `${rating}-10`);
+  const ratingQuery = getQueryString('rating.kp', rating ? `${rating}-10` : '');
   const countriesQuery = getQueryString('countries.name', pickedCountries);
   const networksQuery = getQueryString('networks.items.name', pickedNetworks);
   const genresQuery = getQueryString('genres.name', pickedGenres);

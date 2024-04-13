@@ -193,9 +193,7 @@ export const MainPage = () => {
 
   const onCopyShareLink = async () => {
     try {
-      await navigator.clipboard.writeText(
-        window.location.origin + `/?${query}`,
-      );
+      await navigator.clipboard.writeText(window.location.origin + `/${query}`);
       setlinkCopyStatus('success');
     } catch (e) {
       setlinkCopyStatus('error');

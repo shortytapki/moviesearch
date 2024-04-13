@@ -5,8 +5,8 @@ export {
   userReducerPath,
 } from './model/slice/userSlice';
 export {
-  getUsername,
-  getError,
-  getIsLoggingIn,
-  getUserInitialized,
+  selectUsername,
+  selectUserError,
+  selectIsLoggingIn,
+  selectUserInitialized,
 } from './model/selectors/userSelectors';

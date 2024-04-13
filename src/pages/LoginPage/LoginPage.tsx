@@ -3,11 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { RoutePaths } from '@shared/config/routeConfig';
-import { getUsername } from '@entities/User';
+import { selectUsername } from '@entities/User';
 import { LoginForm } from '@features/authenticateUser';
 
 export default function LoginPage() {
-  const username = useSelector(getUsername);
+  const username = useSelector(selectUsername);
   const navigate = useNavigate();
 
   useEffect(() => {

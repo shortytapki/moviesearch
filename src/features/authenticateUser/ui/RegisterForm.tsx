@@ -2,7 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { Button, Form, FormControl, FormGroup, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@app/providers/store';
-import { getError, getIsLoggingIn } from '@entities/User';
+import { selectUserError, selectIsLoggingIn } from '@entities/User';
 import { register } from '../api/authenticateUser';
 
 interface RegisterFormProps {
@@ -14,8 +14,8 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const isLoggingIn = useSelector(getIsLoggingIn);
-  const error = useSelector(getError);
+  const isLoggingIn = useSelector(selectIsLoggingIn);
+  const error = useSelector(selectUserError);
   const dispatch = useAppDispatch();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -24,9 +24,14 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
   };
 
   return (
-    <Form className={className} onSubmit={handleSubmit}>
+    <Form
+      className={className}
+      onSubmit={handleSubmit}
+      data-testId="register-form"
+    >
       <FormGroup>
         <FormControl
+          data-testId="username"
           type="text"
           id="username"
           placeholder="Имя пользователя"
@@ -43,6 +48,7 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
         )}
       </FormGroup>
       <FormControl
+        data-testId="password"
         type="password"
         placeholder="Пароль"
         name="password"
@@ -52,6 +58,7 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
         disabled={isLoggingIn}
       />
       <FormControl
+        data-testId="confirm-password"
         type="password"
         placeholder="Повторите пароль"
         name="confirmPassword"
@@ -61,6 +68,7 @@ export const RegisterForm = ({ className }: RegisterFormProps) => {
         disabled={isLoggingIn}
       />
       <Button
+        data-testId="submit"
         type="submit"
         disabled={isLoggingIn || confirmPassword !== password}
         className="mb-3"

@@ -33,8 +33,8 @@ export default function MoviePage() {
   const { id: directId } = useParams();
   const {
     data: movie,
-    isSuccess,
     isFetching,
+    isSuccess,
     isError,
     refetch,
   } = useGetMovieByIdQuery(directId || '');
@@ -51,8 +51,8 @@ export default function MoviePage() {
     }
   }, [isError]);
 
-  if (!isSuccess || !directId) return <h1>Фильм с указанным id не найден.</h1>;
-  if (isFetching) return <Spinner size="sm" />;
+  if (isError || !directId) return <h1>Фильм с указанным id не найден.</h1>;
+  if (isFetching || !isSuccess) return <Spinner size="sm" />;
 
   const { alternativeName, name, description, rating, poster, logo, backdrop } =
     movie;

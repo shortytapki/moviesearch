@@ -2,7 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { Button, FormControl, Spinner, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@app/providers/store';
-import { getError, getIsLoggingIn } from '@entities/User';
+import { selectUserError, selectIsLoggingIn } from '@entities/User';
 import { loginByUsername } from '../api/authenticateUser';
 
 interface LoginFormProps {
@@ -13,8 +13,8 @@ export const LoginForm = ({ className }: LoginFormProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
-  const isLoggingIn = useSelector(getIsLoggingIn);
-  const error = useSelector(getError);
+  const isLoggingIn = useSelector(selectIsLoggingIn);
+  const error = useSelector(selectUserError);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,8 +22,13 @@ export const LoginForm = ({ className }: LoginFormProps) => {
   };
 
   return (
-    <Form className={className} onSubmit={handleSubmit}>
+    <Form
+      className={className}
+      onSubmit={handleSubmit}
+      data-testId="login-form"
+    >
       <FormControl
+        data-testId="username"
         type="text"
         placeholder="Имя пользователя"
         name="username"
@@ -34,6 +39,7 @@ export const LoginForm = ({ className }: LoginFormProps) => {
         disabled={isLoggingIn}
       />
       <FormControl
+        data-testId="password"
         type="password"
         placeholder="Пароль"
         name="password"

@@ -5,13 +5,13 @@ import Navbar from 'react-bootstrap/Navbar';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@app/providers/store';
-import { getUsername, userActions } from '@entities/User';
+import { selectUsername, userActions } from '@entities/User';
 import { RoutePaths } from '@shared/config/routeConfig';
 import { MOVIE_SEARCH_USER } from '@shared/consts';
 
 export const Header = () => {
   const navigate = useNavigate();
-  const username = useSelector(getUsername);
+  const username = useSelector(selectUsername);
   const dispatch = useAppDispatch();
   const onLogOut = useCallback(() => {
     localStorage.removeItem(MOVIE_SEARCH_USER);
@@ -20,7 +20,11 @@ export const Header = () => {
   }, [dispatch]);
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <Navbar
+      expand="lg"
+      className="bg-body-tertiary"
+      data-testId="layout-header"
+    >
       <Container>
         <Navbar.Brand href={RoutePaths.main}>MovieSearch</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
