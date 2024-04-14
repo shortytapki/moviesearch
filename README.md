@@ -13,8 +13,12 @@ TOKEN={ВАШ ТОКЕН} npm start
 ## Запуск с помощью Docker
 
 - В файле `docker-compose.dev.yaml` в поле environment по примеру выше замените токен на валидный.
-- Выполните команды :
+- Выполните команду в терминале :
 
 ```console
 docker compose --file docker-compose.dev.yaml up
+```
+Приложение должно быть доступно по URL:
+```console
+http://localhost:7070
 ```
