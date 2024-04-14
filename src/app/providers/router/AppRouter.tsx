@@ -8,6 +8,7 @@ import {
   MoviePage,
   RegisterPage,
   RandomMoviePage,
+  NotFoundPage,
 } from '@pages';
 import { RequireAuth } from './RequireAuth';
 
@@ -37,7 +38,7 @@ const routes: Record<AppRoutes, AppRouteProps> = {
   },
   [AppRoutes.NOT_FOUND]: {
     path: RoutePaths.not_found,
-    element: <>404, запрашиваемая страница не найдена</>,
+    element: <NotFoundPage />,
   },
 };
 

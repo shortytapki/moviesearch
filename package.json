@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "pwd & node ./json-server/index.js & npx webpack serve --env token=${TOKEN} apiUrl=https://api.kinopoisk.dev/v1.4 port=7070 authServerUrl=http://localhost:5173",
+    "start": "node ./json-server/index.js & npx webpack serve --env token=${TOKEN} apiUrl=https://api.kinopoisk.dev/v1.4 port=7070 authServerUrl=http://localhost:5173",
     "build": "webpack --env mode=production token=${TOKEN}",
     "format": "npx prettier ./src --write",
     "lint": "npx eslint src --ext ts,.tsx",
